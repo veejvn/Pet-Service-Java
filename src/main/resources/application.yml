@@ -1,0 +1,17 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /e-commerce
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/e_commerce
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+jwt:
+  signerKey: "+0FYCfYMCh5Eb6gT1W5fd971heL9xlk54GZJN/4Gd5kn5QxZehHWh+t5kJ6l5dy+"
+  valid-duration: 10 # 1 hour
+  refresh-duration: 60 # 24 hours
