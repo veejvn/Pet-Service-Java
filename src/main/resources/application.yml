@@ -17,6 +17,6 @@ spring:
     open-in-view: true
 
 jwt:
-  signerKey: "+0FYCfYMCh5Eb6gT1W5fd971heL9xlk54GZJN/4Gd5kn5QxZehHWh+t5kJ6l5dy+"
-  valid-duration: 10 # 1 hour
-  refresh-duration: 60 # 24 hours
+  signerKey: ${SINGER_KEY}
+  valid-duration: ${VALID_DURATION}
+  refresh-duration: ${REFRESH_DURATION}
