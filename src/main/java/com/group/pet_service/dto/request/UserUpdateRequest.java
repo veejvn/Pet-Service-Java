@@ -1,10 +1,12 @@
 package com.group.pet_service.dto.request;
 
+import com.group.pet_service.enums.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -20,5 +22,5 @@ public class UserUpdateRequest {
     String phoneNum;
     String email;
 
-    List<String> roles;
+    Set<Role> roles;
 }

@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.response;
 
+import com.group.pet_service.enums.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,5 +22,5 @@ public class UserResponse {
     String phoneNum;
     String email;
     Timestamp createdAt;
-    Set<RoleResponse> roles;
+    Set<Role> roles;
 }
