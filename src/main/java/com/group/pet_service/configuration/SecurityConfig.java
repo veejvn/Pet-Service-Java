@@ -1,5 +1,6 @@
 package com.group.pet_service.configuration;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,69 +12,81 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {
-        "/users", 
-        "/auth/token",
-        "/auth/introspect", 
-        "/auth/logout", 
-        "/auth/refresh",
-      //Phần thêm vào để test không cần giữ lại
-        "/test/demo",
-        "/api/v1/services/**",
-        "/api/v1/service-items/**",
-        "/"
-        //----------------------------------------
-    };
+    private final String[] POST_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login"};
+    private final String[] GET_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login"};
 
     @Autowired
-    CustomJwtDecoder customJwtDecoder;
+    public JwtDecoder jwtDecoder;
+
+    @Autowired
+    public JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Cho phép tất cả các nguồn
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+
+        // Cho phép tất cả các phương thức HTTP
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Cho phép tất cả các headers
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+        // Không cần cấu hình allowCredentials nếu cho phép mọi nguồn mà không cần gửi cookie
+        configuration.setAllowCredentials(false);
+        configuration.setMaxAge(3600L); // Giới hạn thời gian cache
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                //Phần thêm vào để test không cần giữ lại    ----Lý-----
-                .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS).permitAll()
-              //Kết thúc Phần thêm vào để test không cần giữ lại ----Lý-----
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .decoder(customJwtDecoder)
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with your configuration
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, POST_PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, GET_PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
                 )
-            )
-            .csrf(AbstractHttpConfigurer::disable);
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfigurer -> jwtConfigurer
+                                .decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter)
+                        )
+
+        );
 
         return httpSecurity.build();
     }
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
-    }
 }

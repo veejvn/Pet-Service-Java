@@ -1,22 +1,20 @@
 package com.group.pet_service.service;
 
-import com.group.pet_service.constant.PredefinedRole;
 import com.group.pet_service.dto.request.UserCreationRequest;
 import com.group.pet_service.dto.request.UserUpdateRequest;
 import com.group.pet_service.dto.response.UserResponse;
 import com.group.pet_service.exception.AppException;
-import com.group.pet_service.exception.ErrorCode;
 import com.group.pet_service.mapper.UserMapper;
-import com.group.pet_service.model.Role;
+import com.group.pet_service.enums.Role;
 import com.group.pet_service.model.User;
-import com.group.pet_service.repository.RoleRepository;
 import com.group.pet_service.repository.UserRepository;
+import com.group.pet_service.util.PasswordUtil;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -29,22 +27,20 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
+    PasswordUtil passwordUtil;
 
     public UserResponse createUser(UserCreationRequest request) {
         User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordUtil.encodePassword(request.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
-        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
-
+        roles.add(Role.USER);
         user.setRoles(roles);
 
         try {
             user = userRepository.save(user);
         } catch (DataIntegrityViolationException exception) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new AppException(HttpStatus.BAD_REQUEST, "User existed", "user-e-01");
         }
 
         return userMapper.toUserResponse(user);
@@ -58,18 +54,20 @@ public class UserService {
 
     public UserResponse getUser(String username){
         return userMapper.toUserResponse(userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED)));
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.BAD_REQUEST, "User not exist", "user-e-02"
+                )));
     }
 
     public UserResponse  updateUser(String userId, UserUpdateRequest request){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+                .orElseThrow(() -> new AppException(
+                        HttpStatus.BAD_REQUEST, "User not exist", "user-e-02"
+                ));
 
         //userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(roles));
+        user.setPassword(passwordUtil.encodePassword(request.getPassword()));
+        user.setRoles(request.getRoles());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -77,11 +75,14 @@ public class UserService {
     public void deleteUser(String userId){
         userRepository.deleteById(userId);
     }
+
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(
+                HttpStatus.BAD_REQUEST, "User not exist", "user-e-02"
+        ));
 
         return userMapper.toUserResponse(user);
     }

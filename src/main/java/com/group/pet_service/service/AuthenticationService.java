@@ -1,17 +1,15 @@
 package com.group.pet_service.service;
 
-import com.group.pet_service.dto.request.AuthenticationRequest;
-import com.group.pet_service.dto.request.IntrospectRequest;
-import com.group.pet_service.dto.request.LogoutRequest;
-import com.group.pet_service.dto.request.RefreshRequest;
-import com.group.pet_service.dto.response.AuthenticationResponse;
+import com.group.pet_service.dto.request.*;
+import com.group.pet_service.dto.response.AuthResponse;
 import com.group.pet_service.dto.response.IntrospectResponse;
 import com.group.pet_service.exception.AppException;
-import com.group.pet_service.exception.ErrorCode;
+import com.group.pet_service.enums.Role;
 import com.group.pet_service.model.Token;
 import com.group.pet_service.model.User;
 import com.group.pet_service.repository.TokenRepository;
 import com.group.pet_service.repository.UserRepository;
+import com.group.pet_service.util.PasswordUtil;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -23,17 +21,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -42,35 +37,68 @@ import java.util.UUID;
 public class AuthenticationService {
     UserRepository userRepository;
     TokenRepository tokenRepository;
+    PasswordUtil passwordUtil;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
-    protected  String SIGNER_KEY;
+    @Value("${app.jwt.signerKey}")
+    private String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected  long VALID_DURATION;
+    @Value("${app.jwt.valid-duration}")
+    private long VALID_DURATION;
 
     @NonFinal
-    @Value("${jwt.refresh-duration}")
-    protected  long REFRESH_DURATION;
+    @Value("${app.jwt.refresh-duration}")
+    private long REFRESH_DURATION;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
-        var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+    public void register(AuthRequest request){
+        boolean existedUser = userRepository.existsByEmail(request.getEmail());
+        if(existedUser){
+            throw new AppException(HttpStatus.BAD_REQUEST, "Email has existed", "auth-e-01");
+        }
+    }
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+    public AuthResponse verifyRegister(AuthRequest request){
+        register(request);
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        String hashedPassword = passwordUtil.encodePassword(request.getPassword());
+        request.setPassword(hashedPassword);
 
-        if(!authenticated)
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        Set<Role> roles = new HashSet<>();
+
+        roles.add(Role.USER);
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
+        user.setRoles(roles);
+        userRepository.save(user);
 
         var token = generateToken(user);
 
-        return AuthenticationResponse.builder()
+        return AuthResponse.builder()
                 .token(token)
-                .authenticated(true)
+                .build();
+    }
+
+    public AuthResponse login(AuthLoginRequest request){
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Email User not found", "auth-e-02"));
+
+        if(!user.getRoles().contains(request.getRole())){
+            throw new AppException(HttpStatus.FORBIDDEN, "Insufficient permissions", "auth-e-03");
+        }
+
+        boolean isMatchPassword = passwordUtil.checkPassword(request.getPassword(), user.getPassword());
+
+        if(!isMatchPassword)
+            throw new AppException(HttpStatus.BAD_REQUEST, "Wrong password", "auth-e-03");
+
+        String token = generateToken(user);
+
+        return AuthResponse.builder()
+                .token(token)
                 .build();
     }
 
@@ -79,7 +107,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
-                .issuer("e_commerce.com")
+                .issuer("pet-service.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
@@ -96,7 +124,7 @@ public class AuthenticationService {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            throw  new AppException(ErrorCode.TOKEN_UNGENERATED);
+            throw  new AppException(HttpStatus.UNAUTHORIZED,"JWT error" ,"jwt-e-01");
         }
     }
 
@@ -104,7 +132,7 @@ public class AuthenticationService {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles()))
             user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_" + role.getName());
+                stringJoiner.add("ROLE_" + role.toString());
                 });
         return  stringJoiner.toString();
     }
@@ -157,16 +185,16 @@ public class AuthenticationService {
         var verified = signedJWT.verify(verifier);
 
         if(!(verified && expiryTime.after(new Date())))
-            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+            throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature or Token has expired","jwt-e-02");
 
         if(tokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(HttpStatus.BAD_REQUEST, "Token existed", "jwt-e-03");
         }
 
         return signedJWT;
     }
 
-    public AuthenticationResponse refreshToken(RefreshRequest request)
+    public AuthResponse refreshToken(RefreshRequest request)
             throws ParseException, JOSEException {
         var signJWT = verifyToken(request.getToken(), true);
 
@@ -182,13 +210,12 @@ public class AuthenticationService {
         var username = signJWT.getJWTClaimsSet().getSubject();
 
         var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Username not found", "jwt-e-04"));
 
         var token = generateToken(user);
 
-        return AuthenticationResponse.builder()
+        return AuthResponse.builder()
                 .token(token)
-                .authenticated(true)
                 .build();
     }
 }
