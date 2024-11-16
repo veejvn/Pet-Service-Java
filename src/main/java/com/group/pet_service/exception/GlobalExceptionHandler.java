@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(false)
                 .message(errorMessage)
-                .code("global-e-01")
+                .code("global-e-02")
                 .build();
         return ResponseEntity.status(400).body(response);
     }

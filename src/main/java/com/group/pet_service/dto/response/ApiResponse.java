@@ -13,5 +13,5 @@ public class ApiResponse<T> {
     boolean success = true;
     String code;
     String message;
-    T result;
+    T data;
 }

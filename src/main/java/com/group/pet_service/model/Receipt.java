@@ -21,7 +21,7 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     int totalItem;
-    double totalCost;
+    double totalPriceReceipt;
     Timestamp createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "receipt", orphanRemoval = true)

@@ -65,7 +65,7 @@ public class AuthenticationController {
         ApiResponse<AuthResponse> apiResponse = ApiResponse.<AuthResponse>builder()
                 .code("auth-s-02")
                 .message("Authenticate successfully")
-                .result(result)
+                .data(result)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
@@ -74,7 +74,7 @@ public class AuthenticationController {
     ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
-                .result(result)
+                .data(result)
                 .build();
     }
 
@@ -96,7 +96,7 @@ public class AuthenticationController {
          ApiResponse<AuthResponse> apiResponse = ApiResponse.<AuthResponse>builder()
                 .code("auth-s-4")
                 .message("Refresh new access token successfully")
-                .result(authResponse)
+                .data(authResponse)
                 .build();
          return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }

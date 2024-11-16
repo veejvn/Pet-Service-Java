@@ -168,30 +168,35 @@ public class AuthenticationService {
         }
     }
 
-    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+    private SignedJWT verifyToken(String token, boolean isRefresh){
+        try{
+            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+            SignedJWT signedJWT = SignedJWT.parse(token);
 
-        SignedJWT signedJWT = SignedJWT.parse(token);
+            if(!signedJWT.verify(verifier)){
+                throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature", "jwt-e-2");
+            }
 
-        Date expiryTime = (isRefresh)
-            ? new Date(signedJWT
-                .getJWTClaimsSet()
-                .getExpirationTime()
-                .toInstant()
-                .plus(REFRESH_DURATION, ChronoUnit.SECONDS)
-                .toEpochMilli())
-        : signedJWT.getJWTClaimsSet().getExpirationTime();
+            Date expiryTime = (isRefresh)
+                    ? new Date(signedJWT
+                    .getJWTClaimsSet()
+                    .getExpirationTime()
+                    .toInstant()
+                    .plus(REFRESH_DURATION, ChronoUnit.SECONDS)
+                    .toEpochMilli())
+                    : signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        var verified = signedJWT.verify(verifier);
+            if(expiryTime.after(new Date()))
+                throw new AppException(HttpStatus.UNAUTHORIZED, "Token has expired","jwt-e-03");
 
-        if(!(verified && expiryTime.after(new Date())))
-            throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature or Token has expired","jwt-e-02");
+            if(tokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+                throw new AppException(HttpStatus.BAD_REQUEST, "Token existed", "jwt-e-04");
+            }
 
-        if(tokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
-            throw new AppException(HttpStatus.BAD_REQUEST, "Token existed", "jwt-e-03");
+            return signedJWT;
+        }catch (ParseException | JOSEException e){
+            throw new AppException(HttpStatus.BAD_REQUEST,  "Failed to verify JWT token", "jwt-e-05");
         }
-
-        return signedJWT;
     }
 
     public AuthResponse refreshToken(RefreshRequest request)
@@ -210,7 +215,7 @@ public class AuthenticationService {
         var username = signJWT.getJWTClaimsSet().getSubject();
 
         var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Username not found", "jwt-e-04"));
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Username not found", "jwt-e-06"));
 
         var token = generateToken(user);
 
