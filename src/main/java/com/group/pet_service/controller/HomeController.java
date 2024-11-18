@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.group.pet_service.dto.serviceDto.ServiceDTO;
+import com.group.pet_service.dto.request.ServiceRequest;
 import com.group.pet_service.service.ServiceService;
 
 @RestController
@@ -23,8 +23,8 @@ public class HomeController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ServiceDTO>> getLatestServices() {
-        List<ServiceDTO> latestServices = serviceService.getLatestServices(5);
+    public ResponseEntity<List<ServiceRequest>> getLatestServices() {
+        List<ServiceRequest> latestServices = serviceService.getLatestServices(5);
         return ResponseEntity.ok(latestServices);
     }
 }

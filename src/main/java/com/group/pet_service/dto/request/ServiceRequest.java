@@ -1,4 +1,4 @@
-package com.group.pet_service.dto.serviceDto;
+package com.group.pet_service.dto.request;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceDTO {
-    private String id;
+public class ServiceRequest {
 
     @NotBlank(message = "Service name is required")
     private String name;
@@ -28,5 +27,5 @@ public class ServiceDTO {
     private boolean disabled;
     private String description;
     private Timestamp createAt;
-    private Set<ServiceImageDTO> images;
+    private Set<ServiceImageRequest> images;
 }

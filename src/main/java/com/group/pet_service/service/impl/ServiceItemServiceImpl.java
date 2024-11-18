@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.group.pet_service.dto.serviceItemDto.ServiceItemDTO;
+import com.group.pet_service.dto.request.ServiceItemRequest;
 import com.group.pet_service.model.ServiceItem;
 import com.group.pet_service.repository.ServiceItemRepository;
 import com.group.pet_service.service.ServiceItemService;
@@ -20,28 +20,28 @@ public class ServiceItemServiceImpl implements ServiceItemService {
     private ServiceItemMapper serviceItemMapper;
 
     @Override
-    public ServiceItemDTO createServiceItem(ServiceItemDTO serviceItemDTO) {
-        ServiceItem serviceItem = serviceItemMapper.toEntity(serviceItemDTO);
+    public ServiceItemRequest createServiceItem(ServiceItemRequest serviceItemRequest) {
+        ServiceItem serviceItem = serviceItemMapper.toEntity(serviceItemRequest);
         ServiceItem savedItem = serviceItemRepository.save(serviceItem);
         return serviceItemMapper.toDTO(savedItem);
     }
 
     @Override
-    public ServiceItemDTO getServiceItemById(String id) {
+    public ServiceItemRequest getServiceItemById(String id) {
         Optional<ServiceItem> serviceItem = serviceItemRepository.findById(id);
         return serviceItem.map(serviceItemMapper::toDTO).orElse(null);
     }
 
     @Override
-    public Page<ServiceItemDTO> getAllServiceItems(Pageable pageable) {
+    public Page<ServiceItemRequest> getAllServiceItems(Pageable pageable) {
         Page<ServiceItem> serviceItems = serviceItemRepository.findAll(pageable);
         return serviceItems.map(serviceItemMapper::toDTO);
     }
 
     @Override
-    public ServiceItemDTO updateServiceItem(String id, ServiceItemDTO serviceItemDTO) {
+    public ServiceItemRequest updateServiceItem(String id, ServiceItemRequest serviceItemRequest) {
         if (serviceItemRepository.existsById(id)) {
-            ServiceItem serviceItem = serviceItemMapper.toEntity(serviceItemDTO);
+            ServiceItem serviceItem = serviceItemMapper.toEntity(serviceItemRequest);
             serviceItem.setId(id);
             ServiceItem updatedItem = serviceItemRepository.save(serviceItem);
             return serviceItemMapper.toDTO(updatedItem);
@@ -55,13 +55,13 @@ public class ServiceItemServiceImpl implements ServiceItemService {
     }
 
     @Override
-    public Page<ServiceItemDTO> getServiceItemsByReceiptId(String receiptId, Pageable pageable) {
+    public Page<ServiceItemRequest> getServiceItemsByReceiptId(String receiptId, Pageable pageable) {
         Page<ServiceItem> serviceItems = serviceItemRepository.findByReceiptId(receiptId, pageable);
         return serviceItems.map(serviceItemMapper::toDTO);
     }
 
     @Override
-    public Page<ServiceItemDTO> getServiceItemsByStaffId(String staffId, Pageable pageable) {
+    public Page<ServiceItemRequest> getServiceItemsByStaffId(String staffId, Pageable pageable) {
         Page<ServiceItem> serviceItems = serviceItemRepository.findByStaffId(staffId, pageable);
         return serviceItems.map(serviceItemMapper::toDTO);
     }

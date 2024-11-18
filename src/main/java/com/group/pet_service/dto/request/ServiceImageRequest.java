@@ -1,4 +1,4 @@
-package com.group.pet_service.dto.serviceDto;
+package com.group.pet_service.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceImageDTO {
-    private String id;
+public class ServiceImageRequest {
     private String url;
 }

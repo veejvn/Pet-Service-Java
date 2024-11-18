@@ -3,12 +3,12 @@ package com.group.pet_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import com.group.pet_service.dto.serviceDto.ServiceDTO;
+import com.group.pet_service.dto.request.ServiceRequest;
 import com.group.pet_service.model.Service;
 
 @Mapper(componentModel = "spring")
 public interface ServiceMapper {
-    ServiceDTO toDTO(Service service);
-    Service toEntity(ServiceDTO dto);
-    void updateEntityFromDTO(ServiceDTO dto, @MappingTarget Service service);
+    ServiceRequest toDTO(Service service);
+    Service toEntity(ServiceRequest request);
+    void updateEntityFromDTO(ServiceRequest request, @MappingTarget Service service);
 }

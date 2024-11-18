@@ -5,13 +5,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.group.pet_service.exception.AppException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.group.pet_service.dto.serviceDto.ServiceDTO;
-import com.group.pet_service.exception.ResourceNotFoundException;
+import com.group.pet_service.dto.request.ServiceRequest;
 import com.group.pet_service.mapper.ServiceMapper;
 import com.group.pet_service.model.Service;
 import com.group.pet_service.repository.ServiceRepository;
@@ -24,33 +25,33 @@ public class ServiceService {
     private final ServiceRepository serviceRepository;
     private final ServiceMapper serviceMapper;
 
-    public Page<ServiceDTO> getAllServices(Pageable pageable) {
+    public Page<ServiceRequest> getAllServices(Pageable pageable) {
         return serviceRepository.findAll(pageable)
                 .map(serviceMapper::toDTO);
     }
 
-    public ServiceDTO getServiceById(String id) {
+    public ServiceRequest getServiceById(String id) {
         return serviceRepository.findById(id)
                 .map(serviceMapper::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-s-01"));
     }
 
     @Transactional
-    public ServiceDTO createService(ServiceDTO serviceDTO) {
-        Service service = serviceMapper.toEntity(serviceDTO);
+    public ServiceRequest createService(ServiceRequest serviceRequest) {
+        Service service = serviceMapper.toEntity(serviceRequest);
         service.setCreateAt(Timestamp.from(Instant.now()));
         service = serviceRepository.save(service);
         return serviceMapper.toDTO(service);
     }
 
     @Transactional
-    public ServiceDTO updateService(String id, ServiceDTO serviceDTO) {
+    public ServiceRequest updateService(String id, ServiceRequest serviceRequest) {
         // Tìm dịch vụ theo ID
         Service existingService = serviceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found with id: " + id));
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-s-01"));
 
         // Cập nhật thông tin từ ServiceDTO vào thực thể đã tồn tại
-        serviceMapper.updateEntityFromDTO(serviceDTO, existingService);
+        serviceMapper.updateEntityFromDTO(serviceRequest, existingService);
 
         // Lưu và cập nhật dịch vụ
         Service updatedService = serviceRepository.save(existingService);
@@ -62,7 +63,7 @@ public class ServiceService {
     @Transactional
     public void deleteService(String id) {
         if (!serviceRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Service not found with id: " + id);
+            throw new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-s-01");
         }
         serviceRepository.deleteById(id);
     }
@@ -71,11 +72,11 @@ public class ServiceService {
         return serviceRepository.findAll();
     }
 
-	public List<ServiceDTO> getLatestServices(int count) {
+	public List<ServiceRequest> getLatestServices(int count) {
         List<Service> latestServices = serviceRepository.findAll(Sort.by(Sort.Direction.DESC, "createAt"))
                 .stream()
                 .limit(count)
-                .collect(Collectors.toList());
+                .toList();
         return latestServices.stream()
                 .map(serviceMapper::toDTO)
                 .collect(Collectors.toList());

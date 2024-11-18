@@ -1,4 +1,4 @@
-package com.group.pet_service.dto.serviceItemDto;
+package com.group.pet_service.dto.request;
 
 import java.sql.Timestamp;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceItemDTO {
+public class ServiceItemRequest {
     private String id;
     
     @NotNull(message = "Status cannot be null")

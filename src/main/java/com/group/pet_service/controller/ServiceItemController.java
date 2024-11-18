@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.group.pet_service.dto.serviceItemDto.ServiceItemDTO;
+import com.group.pet_service.dto.request.ServiceItemRequest;
 import com.group.pet_service.service.ServiceItemService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/service-items")
+@RequestMapping("/api/service-items")
 public class ServiceItemController {
 	private final ServiceItemService serviceItemService;
 
@@ -38,14 +38,14 @@ public class ServiceItemController {
 	}
 
 	@PostMapping
-	public ResponseEntity<ServiceItemDTO> createServiceItem(@Valid @RequestBody ServiceItemDTO serviceItemDTO) {
-		ServiceItemDTO createdItem = serviceItemService.createServiceItem(serviceItemDTO);
+	public ResponseEntity<ServiceItemRequest> createServiceItem(@Valid @RequestBody ServiceItemRequest serviceItemRequest) {
+		ServiceItemRequest createdItem = serviceItemService.createServiceItem(serviceItemRequest);
 		return new ResponseEntity<>(createdItem, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ServiceItemDTO> getServiceItemById(@PathVariable String id) {
-		ServiceItemDTO serviceItem = serviceItemService.getServiceItemById(id);
+	public ResponseEntity<ServiceItemRequest> getServiceItemById(@PathVariable String id) {
+		ServiceItemRequest serviceItem = serviceItemService.getServiceItemById(id);
 		return serviceItem != null ? ResponseEntity.ok(serviceItem) : ResponseEntity.notFound().build();
 	}
 
@@ -76,9 +76,9 @@ public class ServiceItemController {
 
 			Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
 
-			Page<ServiceItemDTO> pageServiceItems = serviceItemService.getAllServiceItems(pageable);
+			Page<ServiceItemRequest> pageServiceItems = serviceItemService.getAllServiceItems(pageable);
 
-			List<ServiceItemDTO> serviceItems = pageServiceItems.getContent();
+			List<ServiceItemRequest> serviceItems = pageServiceItems.getContent();
 
 			Map<String, Object> response = new HashMap<>();
 			response.put("serviceItems", serviceItems);
@@ -103,9 +103,9 @@ public class ServiceItemController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ServiceItemDTO> updateServiceItem(@PathVariable String id,
-			@Valid @RequestBody ServiceItemDTO serviceItemDTO) {
-		ServiceItemDTO updatedItem = serviceItemService.updateServiceItem(id, serviceItemDTO);
+	public ResponseEntity<ServiceItemRequest> updateServiceItem(@PathVariable String id,
+																@Valid @RequestBody ServiceItemRequest serviceItemRequest) {
+		ServiceItemRequest updatedItem = serviceItemService.updateServiceItem(id, serviceItemRequest);
 		return updatedItem != null ? ResponseEntity.ok(updatedItem) : ResponseEntity.notFound().build();
 	}
 
@@ -116,18 +116,18 @@ public class ServiceItemController {
 	}
 
 	@GetMapping("/receipt/{receiptId}")
-	public ResponseEntity<Page<ServiceItemDTO>> getServiceItemsByReceiptId(@PathVariable String receiptId,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+	public ResponseEntity<Page<ServiceItemRequest>> getServiceItemsByReceiptId(@PathVariable String receiptId,
+																			   @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ServiceItemDTO> serviceItems = serviceItemService.getServiceItemsByReceiptId(receiptId, pageable);
+		Page<ServiceItemRequest> serviceItems = serviceItemService.getServiceItemsByReceiptId(receiptId, pageable);
 		return ResponseEntity.ok(serviceItems);
 	}
 
 	@GetMapping("/staff/{staffId}")
-	public ResponseEntity<Page<ServiceItemDTO>> getServiceItemsByStaffId(@PathVariable String staffId,
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+	public ResponseEntity<Page<ServiceItemRequest>> getServiceItemsByStaffId(@PathVariable String staffId,
+																			 @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ServiceItemDTO> serviceItems = serviceItemService.getServiceItemsByStaffId(staffId, pageable);
+		Page<ServiceItemRequest> serviceItems = serviceItemService.getServiceItemsByStaffId(staffId, pageable);
 		return ResponseEntity.ok(serviceItems);
 	}
 }
