@@ -1,9 +1,10 @@
-package com.group.pet_service.controller;
+package com.group.pet_service.restcontroller;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.group.pet_service.dto.response.ApiResponse;
+import com.group.pet_service.dto.response.ServiceResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -30,10 +31,21 @@ import lombok.RequiredArgsConstructor;
 public class ServiceController {
 	private final ServiceService serviceService;
 
+	@PostMapping
+	public ResponseEntity<ApiResponse<ServiceResponse>> createService(@Valid @RequestBody ServiceRequest serviceRequest) {
+		ServiceResponse createdService = serviceService.createService(serviceRequest);
+		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
+				.code("service-s-03")
+				.message("Create service successfully")
+				.result(createdService)
+				.build();
+		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+	}
+
 	/* Lấy trang đầu tiên 20 phần tử/api/v1/services?page=0&size=20 */
 	@GetMapping
 	public ResponseEntity<ApiResponse<Map<String, Object>>> getAllServices(@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		Page<ServiceRequest> servicePage = serviceService.getAllServices(pageable);
+		Page<ServiceResponse> servicePage = serviceService.getAllServices(pageable);
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("services", servicePage.getContent());
@@ -51,9 +63,9 @@ public class ServiceController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<ServiceRequest>> getServiceById(@PathVariable String id) {
-		ServiceRequest service = serviceService.getServiceById(id);
-		ApiResponse<ServiceRequest> apiResponse = ApiResponse.<ServiceRequest>builder()
+	public ResponseEntity<ApiResponse<ServiceResponse>> getServiceById(@PathVariable String id) {
+		ServiceResponse service = serviceService.getServiceById(id);
+		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
 				.code("service-s-02")
 				.message("Get service successfully")
 				.result(service)
@@ -62,24 +74,13 @@ public class ServiceController {
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
 	}
 
-	@PostMapping
-	public ResponseEntity<ApiResponse<ServiceRequest>> createService(@Valid @RequestBody ServiceRequest serviceRequest) {
-		ServiceRequest createdService = serviceService.createService(serviceRequest);
-		ApiResponse<ServiceRequest> apiResponse = ApiResponse.<ServiceRequest>builder()
-				.code("service-s-03")
-				.message("Create service successfully")
-				.result(createdService)
-				.build();
-		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-	}
-
 	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse<ServiceRequest>> updateService(@PathVariable String id,
+	public ResponseEntity<ApiResponse<ServiceResponse>> updateService(@PathVariable String id,
 																	 @Valid @RequestBody ServiceRequest serviceRequest) {
 		// Gọi phương thức updateService để cập nhật dịch vụ
 
-		ServiceRequest updatedService = serviceService.updateService(id, serviceRequest);
-		ApiResponse<ServiceRequest> apiResponse = ApiResponse.<ServiceRequest>builder()
+		ServiceResponse updatedService = serviceService.updateService(id, serviceRequest);
+		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
 				.code("service-s-04")
 				.message("Update service successfully")
 				.result(updatedService)

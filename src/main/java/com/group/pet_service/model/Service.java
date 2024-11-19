@@ -4,17 +4,10 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -34,6 +27,9 @@ public class Service {
     Timestamp createAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "service", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<ServiceImage> images = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "service", orphanRemoval = true)
     Set<ServiceItem> items = new HashSet<>();
@@ -44,5 +40,8 @@ public class Service {
 				+ description + ", createAt=" + createAt + ", images=" + images + ", items=" + items + "]";
 	}
     
-    
+    @PrePersist
+    protected void onCreate(){
+        this.disabled = false;
+    }
 }

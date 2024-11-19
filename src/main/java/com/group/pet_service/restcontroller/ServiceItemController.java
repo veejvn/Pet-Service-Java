@@ -1,4 +1,4 @@
-package com.group.pet_service.controller;
+package com.group.pet_service.restcontroller;
 
 import java.util.ArrayList;
 import java.util.HashMap;

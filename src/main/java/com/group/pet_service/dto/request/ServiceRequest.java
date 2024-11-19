@@ -24,8 +24,7 @@ public class ServiceRequest {
     @Positive(message = "Price must be positive")
     private Double price;
 
-    private boolean disabled;
     private String description;
-    private Timestamp createAt;
-    private Set<ServiceImageRequest> images;
+    private Set<String> images;
+
 }

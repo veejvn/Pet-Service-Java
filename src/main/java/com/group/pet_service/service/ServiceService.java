@@ -2,10 +2,14 @@ package com.group.pet_service.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.group.pet_service.dto.response.ServiceResponse;
 import com.group.pet_service.exception.AppException;
+import com.group.pet_service.model.ServiceImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,27 +29,36 @@ public class ServiceService {
     private final ServiceRepository serviceRepository;
     private final ServiceMapper serviceMapper;
 
-    public Page<ServiceRequest> getAllServices(Pageable pageable) {
+    public Page<ServiceResponse> getAllServices(Pageable pageable) {
         return serviceRepository.findAll(pageable)
                 .map(serviceMapper::toDTO);
     }
 
-    public ServiceRequest getServiceById(String id) {
+    public ServiceResponse getServiceById(String id) {
         return serviceRepository.findById(id)
                 .map(serviceMapper::toDTO)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-s-01"));
     }
 
     @Transactional
-    public ServiceRequest createService(ServiceRequest serviceRequest) {
+    public ServiceResponse createService(ServiceRequest serviceRequest) {
         Service service = serviceMapper.toEntity(serviceRequest);
         service.setCreateAt(Timestamp.from(Instant.now()));
+        Set<ServiceImage> images = new HashSet<>();
+        for(String imageUrl : serviceRequest.getImages()){
+            ServiceImage image = ServiceImage.builder()
+                    .url(imageUrl)
+                    .service(service)
+                    .build();
+            images.add(image);
+        }
+        service.setImages(images);
         service = serviceRepository.save(service);
         return serviceMapper.toDTO(service);
     }
 
     @Transactional
-    public ServiceRequest updateService(String id, ServiceRequest serviceRequest) {
+    public ServiceResponse updateService(String id, ServiceRequest serviceRequest) {
         // Tìm dịch vụ theo ID
         Service existingService = serviceRepository.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-s-01"));
@@ -72,7 +85,7 @@ public class ServiceService {
         return serviceRepository.findAll();
     }
 
-	public List<ServiceRequest> getLatestServices(int count) {
+	public List<ServiceResponse> getLatestServices(int count) {
         List<Service> latestServices = serviceRepository.findAll(Sort.by(Sort.Direction.DESC, "createAt"))
                 .stream()
                 .limit(count)

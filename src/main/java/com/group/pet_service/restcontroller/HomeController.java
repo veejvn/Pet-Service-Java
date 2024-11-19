@@ -1,7 +1,8 @@
-package com.group.pet_service.controller;
+package com.group.pet_service.restcontroller;
 
 import java.util.List;
 
+import com.group.pet_service.dto.response.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +24,8 @@ public class HomeController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ServiceRequest>> getLatestServices() {
-        List<ServiceRequest> latestServices = serviceService.getLatestServices(5);
+    public ResponseEntity<List<ServiceResponse>> getLatestServices() {
+        List<ServiceResponse> latestServices = serviceService.getLatestServices(5);
         return ResponseEntity.ok(latestServices);
     }
 }
