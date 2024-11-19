@@ -33,3 +33,10 @@ app:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
   clientReceiveTokensPath: ${CLIENT_RECEIVE_TOKENS_PATH}
+  cloudinary:
+    cloud:
+      name: ${CLOUDINARY_NAME}
+    api:
+      key: ${CLOUDINARY_API_KEY}
+      secret: ${CLOUDINARY_API_SECRET}
+    folder: ${CLOUDINARY_FOLDER}
