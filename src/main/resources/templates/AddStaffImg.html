@@ -292,8 +292,7 @@
                         <h2>Adding New Staff Image</h2>
                         <form  th:action="@{/add-staff-image}" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
-                                <label for="staffId" class="form-label">Staff ID</label>
-                                <input type="text" class="form-control" id="staffId" name="staffId" placeholder="Enter staff ID" required>
+                                <input type="hidden" class="form-control" id="staffId" name="staffId" placeholder="Enter staff ID" th:value="${id}" required>
                             </div>
                             <!-- Image Upload -->
                             <div class="mb-3">

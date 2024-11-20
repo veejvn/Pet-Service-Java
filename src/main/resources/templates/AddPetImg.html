@@ -302,8 +302,7 @@
                         <h2>Adding New Services</h2>
                         <form  th:action="@{/add-pet-image}" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
-                                <label for="petId" class="form-label">Pet ID</label>
-                                <input type="text" class="form-control" id="petId" name="petId" placeholder="Enter Pet ID" required>
+                                <input type="hidden" class="form-control" id="petId" name="petId" placeholder="Enter Pet ID" th:value="${id}" required>
                             </div>
                             <!-- Image Upload -->
                             <div class="mb-3">

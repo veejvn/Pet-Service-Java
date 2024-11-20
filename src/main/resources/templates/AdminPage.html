@@ -450,6 +450,7 @@
                             <form action="/pet-service/delete-staff/${user.id}" method="POST" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
                             </form>
+                            <a href="/pet-service/add-staff-image/${user.id}" class="btn btn-primary btn-sm">Add Image</a>
                         </td>
                     `;
 
@@ -485,6 +486,7 @@
                         <form action="/pet-service/delete-service/${service.id}" method="POST" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this service?')">Delete</button>
                         </form>
+                        <a href="/pet-service/add-service-image/${service.id}" class="btn btn-primary btn-sm">Add Image</a>
                     </td>
                 `;
 
@@ -523,6 +525,7 @@
                     <form action="/pet-service/delete-pet/${pet.id}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this pet?')">Delete</button>
                     </form>
+                    <a href="/pet-service/add-pet-image/${pet.id}" class="btn btn-primary btn-sm">Add Image</a> <!-- Adjust the link path if necessary -->
                 </td>
             `;
 

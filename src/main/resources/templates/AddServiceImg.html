@@ -294,8 +294,7 @@
                         <h2>Adding New Services</h2>
                         <form  th:action="@{/add-service-image}" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
-                                <label for="serviceId" class="form-label">Service ID</label>
-                                <input type="text" class="form-control" id="serviceId" name="serviceId" placeholder="Enter service ID" required>
+                                <input type="hidden" class="form-control" id="serviceId" name="serviceId" placeholder="Enter service ID" th:value="${id}" required>
                             </div>
                             <!-- Image Upload -->
                             <div class="mb-3">

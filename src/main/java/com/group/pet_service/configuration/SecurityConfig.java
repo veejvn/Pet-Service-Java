@@ -27,20 +27,20 @@ public class SecurityConfig {
     private final String[] ADMIN_ENDPOINTS = {
             "/admin",
             "/add-staff",
-            "/add-staff-image",
+            "/add-staff-image/**",
             "/edit-staff/**",
             "/delete-staff/**",
             "/add-service",
             "/edit-service/**",
             "/delete-service/**",
-            "/add-service-image",
+            "/add-service-image/**",
             "/add-species",
             "/edit-species/**",
             "/delete-species/**",
             "/add-pet",
             "/edit-pet/**",
             "/delete-pet/**",
-            "/add-pet-image",
+            "/add-pet-image/**",
     };
 
     private final String[] PUBLIC_ENDPOINTS = {

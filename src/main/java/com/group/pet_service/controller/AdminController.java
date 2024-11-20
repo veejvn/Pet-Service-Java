@@ -188,8 +188,9 @@ public class AdminController {
     }
 
 
-    @GetMapping("/add-service-image")
-    public String addServiceImg(Model model){
+    @GetMapping("/add-service-image/{id}")
+    public String addServiceImg(@PathVariable String id, Model model){
+        model.addAttribute("id",id);
         return "addServiceImg";
     }
 
@@ -373,8 +374,9 @@ public class AdminController {
 
 
 
-    @GetMapping("/add-pet-image")
-    public String addPetImg(Model model){
+    @GetMapping("/add-pet-image/{id}")
+    public String addPetImg(@PathVariable String id, Model model){
+        model.addAttribute("id",id);
         return "addPetImg";
     }
 
@@ -398,8 +400,9 @@ public class AdminController {
     }
 
 
-    @GetMapping("/add-staff-image")
-    public String addStaffImage(Model model){
+    @GetMapping("/add-staff-image/{id}")
+    public String addStaffImage(@PathVariable String id, Model model){
+        model.addAttribute("id",id);
         return "addStaffImg";
     }
 
