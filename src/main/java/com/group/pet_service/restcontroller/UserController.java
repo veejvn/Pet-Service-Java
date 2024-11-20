@@ -5,7 +5,9 @@ import com.group.pet_service.dto.request.UserUpdateRequest;
 import com.group.pet_service.dto.response.ApiResponse;
 import com.group.pet_service.dto.response.UserResponse;
 import com.group.pet_service.mapper.UserMapper;
+import com.group.pet_service.service.AuthenticationService;
 import com.group.pet_service.service.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +25,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-    UserMapper userMapper;
 
-    @PostMapping
-    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
-                .build();
-    }
+    UserMapper userMapper;
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers(){
         var authentication = SecurityContextHolder.getContext().getAuthentication();

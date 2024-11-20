@@ -1,17 +1,19 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.request.AuthenticationRequest;
-import com.group.pet_service.dto.request.IntrospectRequest;
-import com.group.pet_service.dto.request.LogoutRequest;
-import com.group.pet_service.dto.request.RefreshRequest;
+import com.group.pet_service.dto.request.*;
 import com.group.pet_service.dto.response.ApiResponse;
 import com.group.pet_service.dto.response.AuthenticationResponse;
-import com.group.pet_service.dto.response.IntrospectResponse;
+import com.group.pet_service.dto.response.UserResponse;
+import com.group.pet_service.enums.RoleEnum;
 import com.group.pet_service.service.AuthenticationService;
+import com.group.pet_service.service.UserService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,21 +27,44 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
     AuthenticationService authenticationService;
-    @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
-        var result = authenticationService.authenticate(request);
+
+    @PostMapping("/signin")
+    ApiResponse<AuthenticationResponse> signin(@RequestBody AuthenticationRequest request){
+        var result = authenticationService.login(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
                 .build();
     }
 
-    @PostMapping("introspect")
-    ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
-        var result = authenticationService.introspect(request);
-        return ApiResponse.<IntrospectResponse>builder()
-                .result(result)
+    @PostMapping("/signup")
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(authenticationService.signup(request, RoleEnum.USER))
                 .build();
     }
+
+    @PostMapping("/verify")
+    public ApiResponse verify(
+            @RequestBody UserVerifyCodeRequest request
+    )  {
+        authenticationService.verifyCode(request);
+        return ApiResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Verify Email Success")
+                .build();
+    }
+
+    @PostMapping("/resend")
+    public ApiResponse resendVerifyCode(
+            @RequestBody ResendCodeRequest request
+    ) throws MessagingException {
+        authenticationService.resendVerifyCode(request);
+        return ApiResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Resend verify code Success")
+                .build();
+    }
+
 
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestBody LogoutRequest request)
@@ -49,7 +74,7 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refreshToken")
     ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request)
             throws ParseException, JOSEException {
         var result = authenticationService.refreshToken(request);

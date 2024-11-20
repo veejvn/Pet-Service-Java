@@ -27,5 +27,6 @@ package com.group.pet_service.enums;
 
 public enum RoleEnum {
     ADMIN,
+    STAFF,
     USER
 }

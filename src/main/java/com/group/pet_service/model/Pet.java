@@ -19,7 +19,7 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    Long weight;
+    Double weight;
     Integer height;
     String description;
 
@@ -27,6 +27,10 @@ public class Pet {
     Set<PetImage> images = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet", orphanRemoval = true)
     Set<Receipt> receipts = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "species_id")

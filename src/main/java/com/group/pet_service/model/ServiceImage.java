@@ -20,5 +20,5 @@ public class ServiceImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id")
     @JsonBackReference
-    Service service;
+    PetService petService;
 }

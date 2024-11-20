@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -20,16 +24,44 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token",
-            "/auth/introspect", "/auth/logout", "/auth/refresh"};
+    private final String[] ADMIN_ENDPOINTS = {
+            "/admin",
+            "/add-staff",
+            "/add-staff-image",
+            "/add-service",
+            "/add-service-image",
+            "/add-species",
+            "/add-pet",
+            "/add-pet-image",
+    };
+
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/auth/signin",
+            "/auth/signup",
+            "/auth/refreshToken",
+            "/auth/verify",
+            "/greeting",
+    };
+    private final String[] PUBLIC_GET_ENDPOINT = {
+            "/users",
+            "/css/**",
+            "js/**",
+            "img/**",
+            "scss/**",
+            "vendor/**",
+    };
 
     @Autowired
     CustomJwtDecoder customJwtDecoder;
+
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT).permitAll()
+                .requestMatchers(ADMIN_ENDPOINTS).permitAll()
                 .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
@@ -57,5 +89,15 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
+    }
+
+    @Bean
+    protected UserDetailsService userDetailsService() {
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("admin123")
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(admin);
     }
 }

@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +30,12 @@ public class User {
     String password;
     String phoneNum;
     String email;
-    Timestamp createdAt;
+    Date createdAt;
+
+    Boolean verified = false;
+
+    String verificationCode;
+    LocalDateTime verificationExpiry;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     Set<UserImage> images = new HashSet<>();
@@ -38,6 +45,8 @@ public class User {
     Set<Receipt> receipts = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "staff",orphanRemoval = true)
     Set<ServiceItem> items = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user",orphanRemoval = true)
+    Set<Pet> pets = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(
