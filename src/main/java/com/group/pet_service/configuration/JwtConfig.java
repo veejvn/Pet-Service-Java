@@ -13,12 +13,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 public class JwtConfig {
-    @Value("${app.jwt.signerKey}")
-    private String SIGNER_KEY;
+    @Value("${app.jwt.access.secret}")
+    private String SECRET_KEY;
 
     @Bean
     public JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS512");
         return NimbusJwtDecoder
                 .withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)

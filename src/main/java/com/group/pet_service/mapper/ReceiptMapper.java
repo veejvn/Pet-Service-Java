@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ReceiptMapper {
 
-    ReceiptCreateRequest.ServiceItemDTO toServiceItemDTO(ServiceItem serviceItem);
+    ReceiptResponse.ServiceItemDTO toServiceItemDTO(ServiceItem serviceItem);
 
     ReceiptResponse toReceiptResponse(Receipt receipt);
 }

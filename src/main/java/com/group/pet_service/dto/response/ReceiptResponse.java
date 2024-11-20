@@ -22,12 +22,13 @@ public class ReceiptResponse {
 
     @Data
     public static class ServiceItemDTO {
-        ServiceItemDTO id;
+        String id;
         ServiceItemStatus status;
         int quantity;
         double totalPrice;
         Timestamp start;
         Timestamp end;
         UserResponse staff;
+        ServiceResponse service;
     }
 }

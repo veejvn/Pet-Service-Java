@@ -2,6 +2,7 @@ package com.group.pet_service.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,9 @@ public class Receipt {
     Timestamp createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "receipt", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<ServiceItem> items = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

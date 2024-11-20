@@ -1,9 +1,11 @@
 package com.group.pet_service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.group.pet_service.enums.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -14,13 +16,10 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-    String firstname;
-    String lastname;
+    String displayName;
     boolean gender;
-    Date dob;
-    String password;
-    String phoneNum;
-    String email;
-
-    Set<Role> roles;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    LocalDate dob;
+    String phoneNumber;
+    String avatar;
 }

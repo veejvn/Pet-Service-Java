@@ -1,33 +1,33 @@
 package com.group.pet_service.service;
 
+import com.group.pet_service.dto.auth.ChangePasswordRequest;
+import com.group.pet_service.dto.auth.ForgotPasswordRequest;
+import com.group.pet_service.dto.auth.UserInfoResponse;
+import com.group.pet_service.dto.auth.VerifyForgotPasswordRequest;
+import com.group.pet_service.dto.jwt.JWTPayloadDto;
 import com.group.pet_service.dto.request.*;
 import com.group.pet_service.dto.response.AuthResponse;
-import com.group.pet_service.dto.response.IntrospectResponse;
+import com.group.pet_service.dto.response.UserResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.enums.Role;
-import com.group.pet_service.model.Token;
+import com.group.pet_service.mapper.UserMapper;
+import com.group.pet_service.model.RefreshToken;
 import com.group.pet_service.model.User;
-import com.group.pet_service.repository.TokenRepository;
+import com.group.pet_service.repository.RefreshTokenRepository;
 import com.group.pet_service.repository.UserRepository;
 import com.group.pet_service.util.PasswordUtil;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
+import com.group.pet_service.util.UserUtil;
+import com.group.pet_service.util.jwt.AccessTokenUtil;
+import com.group.pet_service.util.jwt.RefreshTokenUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.text.ParseException;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -36,20 +36,12 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
     UserRepository userRepository;
-    TokenRepository tokenRepository;
+    AccessTokenUtil accessTokenUtil;
+    RefreshTokenUtil refreshTokenUtil;
+    RefreshTokenRepository refreshTokenRepository;
+    UserMapper userMapper;
+    UserUtil userUtil;
     PasswordUtil passwordUtil;
-
-    @NonFinal
-    @Value("${app.jwt.signerKey}")
-    private String SIGNER_KEY;
-
-    @NonFinal
-    @Value("${app.jwt.valid-duration}")
-    private long VALID_DURATION;
-
-    @NonFinal
-    @Value("${app.jwt.refresh-duration}")
-    private long REFRESH_DURATION;
 
     public void register(AuthRequest request){
         boolean existedUser = userRepository.existsByEmail(request.getEmail());
@@ -71,156 +63,104 @@ public class AuthenticationService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .createdAt(Timestamp.from(Instant.now()))
                 .build();
         user.setRoles(roles);
         userRepository.save(user);
 
-        var token = generateToken(user);
+        String accessToken = accessTokenUtil.generateToken(userMapper.toJWTPayloadDto(user));
+        String refreshToken = refreshTokenUtil.generateToken(userMapper.toJWTPayloadDto(user), user);
 
         return AuthResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    public AuthResponse login(AuthLoginRequest request){
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Email User not found", "auth-e-02"));
+    public AuthResponse login(AuthLoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Email not found", "auth-e-02"));
 
-        if(!user.getRoles().contains(request.getRole())){
+        if (!user.getRoles().contains(request.getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN, "Insufficient permissions", "auth-e-03");
         }
 
         boolean isMatchPassword = passwordUtil.checkPassword(request.getPassword(), user.getPassword());
 
-        if(!isMatchPassword)
-            throw new AppException(HttpStatus.BAD_REQUEST, "Wrong password", "auth-e-03");
+        if (!isMatchPassword) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Wrong password", "auth-e-04");
+        }
 
-        String token = generateToken(user);
+        String accessToken = accessTokenUtil.generateToken(userMapper.toJWTPayloadDto(user));
+        String refreshToken = refreshTokenUtil.generateToken(userMapper.toJWTPayloadDto(user), user);
 
         return AuthResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    public String generateToken(User user){
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getId())
-                .issuer("pet-service.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
-                ))
-                .jwtID(UUID.randomUUID().toString())
-                .claim("scope", buildScope(user))
-                .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            throw  new AppException(HttpStatus.UNAUTHORIZED,"JWT error" ,"jwt-e-01");
-        }
+    public void logout(LogoutRequest request){
+        JWTPayloadDto jwtPayloadDto = refreshTokenUtil.verifyToken(request.getRefreshToken());
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(jwtPayloadDto.getId())
+                .orElseThrow(
+                    () -> new AppException(HttpStatus.NOT_FOUND, "Refresh token not found", "auth-e-05")
+                );
+        refreshToken.setToken(null);
+        refreshTokenRepository.save(refreshToken);
     }
 
-    private  String buildScope(User user){
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if (!CollectionUtils.isEmpty(user.getRoles()))
-            user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_" + role.toString());
-                });
-        return  stringJoiner.toString();
-    }
-
-    public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
-        var token = request.getToken();
-        boolean isValid = true;
-
-        try {
-            verifyToken(token, false);
-        } catch (AppException e){
-            isValid = false;
-        }
-
-        return IntrospectResponse.builder()
-                .valid(isValid)
-                .build();
-    }
-
-    public void logout(LogoutRequest request) throws ParseException, JOSEException {
-        try {
-            var signedToken = verifyToken(request.getToken(), true);
-
-            String jit = signedToken.getJWTClaimsSet().getJWTID();
-            log.info(jit);
-            Token invalidateToken = Token.builder()
-                    .id(jit)
-                    .build();
-
-            tokenRepository.save(invalidateToken);
-        }catch (AppException e) {
-            log.info("Token already expired");
-        }
-    }
-
-    private SignedJWT verifyToken(String token, boolean isRefresh){
-        try{
-            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            if(!signedJWT.verify(verifier)){
-                throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature", "jwt-e-2");
-            }
-
-            Date expiryTime = (isRefresh)
-                    ? new Date(signedJWT
-                    .getJWTClaimsSet()
-                    .getExpirationTime()
-                    .toInstant()
-                    .plus(REFRESH_DURATION, ChronoUnit.SECONDS)
-                    .toEpochMilli())
-                    : signedJWT.getJWTClaimsSet().getExpirationTime();
-
-            if(expiryTime.after(new Date()))
-                throw new AppException(HttpStatus.UNAUTHORIZED, "Token has expired","jwt-e-03");
-
-            if(tokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
-                throw new AppException(HttpStatus.BAD_REQUEST, "Token existed", "jwt-e-04");
-            }
-
-            return signedJWT;
-        }catch (ParseException | JOSEException e){
-            throw new AppException(HttpStatus.BAD_REQUEST,  "Failed to verify JWT token", "jwt-e-05");
-        }
-    }
-
-    public AuthResponse refreshToken(RefreshRequest request)
-            throws ParseException, JOSEException {
-        var signJWT = verifyToken(request.getToken(), true);
-
-        var jit = signJWT.getJWTClaimsSet().getJWTID();
-        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
-
-        Token invalidateToken = Token.builder()
-                .id(jit)
-                .build();
-
-        tokenRepository.save(invalidateToken);
-
-        var username = signJWT.getJWTClaimsSet().getSubject();
-
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Username not found", "jwt-e-06"));
-
-        var token = generateToken(user);
-
+    public AuthResponse refreshToken(RefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+        JWTPayloadDto jwtPayloadDto = refreshTokenUtil.verifyToken(refreshToken);
+        String accessToken = accessTokenUtil.generateToken(jwtPayloadDto);
         return AuthResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
                 .build();
+    }
+
+    public void changePassword(ChangePasswordRequest request){
+        String userId = userUtil.getUserId();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Account not found", "auth-e-06")
+        );
+        boolean isMatchPassword = passwordUtil.checkPassword(request.getCurrentPassword(), user.getPassword());
+        if(!isMatchPassword){
+            throw new AppException(HttpStatus.BAD_REQUEST, "Wrong current password", "auth-e-07");
+        }
+        String newPassword = passwordUtil.encodePassword(request.getNewPassword());
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+
+    public void forgotPassword(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Email not found", "auth-e-02")
+        );
+    }
+
+    public AuthResponse verifyForgotPassword(String email, VerifyForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Email not found", "auth-e-02")
+        );
+        String hashedPassword = passwordUtil.encodePassword(request.getNewPassword());
+        user.setPassword(hashedPassword);
+        userRepository.save(user);
+        String accessTokenString = accessTokenUtil.generateToken(userMapper.toJWTPayloadDto(user));
+        String refreshTokenString = refreshTokenUtil.generateToken(userMapper.toJWTPayloadDto(user), user);
+        return AuthResponse.builder()
+                .accessToken(accessTokenString)
+                .refreshToken(refreshTokenString)
+                .build();
+    }
+
+    public UserInfoResponse getUserInfo() {
+        String userId = userUtil.getUserId();
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(
+                        () -> new AppException(HttpStatus.NOT_FOUND, "User not found", "auth-e-06")
+                );
+        return userMapper.toUserInfoResponse(user);
     }
 }

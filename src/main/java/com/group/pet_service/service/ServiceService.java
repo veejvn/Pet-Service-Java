@@ -53,7 +53,7 @@ public class ServiceService {
             images.add(image);
         }
         service.setImages(images);
-        service = serviceRepository.save(service);
+        serviceRepository.save(service);
         return serviceMapper.toDTO(service);
     }
 

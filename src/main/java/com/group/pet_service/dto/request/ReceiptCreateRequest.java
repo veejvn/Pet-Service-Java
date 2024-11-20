@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.group.pet_service.model.ServiceItem;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -33,8 +34,10 @@ public class ReceiptCreateRequest {
         int quantity;
 
         @NotNull(message = "Start time is required")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         Timestamp start;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @NotNull(message = "Start end is required")
         Timestamp end;
     }

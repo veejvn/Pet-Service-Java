@@ -28,7 +28,7 @@ public class PetRequest {
     String description;
 
     @NotEmpty(message = "At least one image path is required")
-    Set<@NotBlank(message = "Image path cannot be blank") String> imageUrls;
+    Set<@NotBlank(message = "Image path cannot be blank") String> images;
 
     @NotBlank(message = "Pet species is required")
     String species_id;

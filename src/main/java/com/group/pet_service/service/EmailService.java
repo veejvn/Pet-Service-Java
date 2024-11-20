@@ -11,6 +11,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -19,7 +22,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendEMail(SendEmailDto emailPayload){
+    public void sendEmail(SendEmailDto emailPayload){
         var message = mailSender.createMimeMessage();
         try{
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -46,6 +49,16 @@ public class EmailService {
                 .subject("Verity email to register")
                 .text(emailText)
                 .build();
-        sendEMail(emailPayload);
+        sendEmail(emailPayload);
+    }
+
+    public void sendEmailToVerifyForgotPassword(String toEmail, String verificationCode) {
+        String emailText = "The confirmation code to create a new password is: " + verificationCode;
+        SendEmailDto emailPayload = SendEmailDto.builder()
+                .to(toEmail)
+                .subject("Verity to create new password")
+                .text(emailText)
+                .build();
+        sendEmail(emailPayload);
     }
 }

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +42,10 @@ public class ReceiptService {
                 .user(user)
                 .pet(pet)
                 .build();
-        receiptRepository.save(receipt);
+//        receiptRepository.save(receipt);
         int totalItem = 0;
         double totalPriceReceipt = 0.0;
+        Set<ServiceItem> items = new HashSet<>();
         for(ReceiptCreateRequest.ServiceItemDTO serviceItemDTO : request.getItems()){
             User staff = userRepository.findById(serviceItemDTO.getStaffId()).orElseThrow(
                     () -> new AppException(HttpStatus.NOT_FOUND, "Staff not found", "user-e-03")
@@ -65,8 +68,11 @@ public class ReceiptService {
                     .receipt(receipt)
                     .staff(staff)
                     .build();
-            receipt.getItems().add(serviceItem);
+            items.add(serviceItem);
         }
+        receipt.setItems(items);
+        receipt.setTotalItem(totalItem);
+        receipt.setTotalPriceReceipt(totalPriceReceipt);
         receiptRepository.save(receipt);
         return receiptMapper.toReceiptResponse(receipt);
     }

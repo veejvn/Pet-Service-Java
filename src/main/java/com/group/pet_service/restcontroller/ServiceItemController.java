@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group.pet_service.dto.request.ServiceItemRequest;
-import com.group.pet_service.service.ServiceItemService;
 
 import jakarta.validation.Valid;
 

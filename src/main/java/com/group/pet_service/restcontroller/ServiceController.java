@@ -37,7 +37,7 @@ public class ServiceController {
 		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
 				.code("service-s-03")
 				.message("Create service successfully")
-				.result(createdService)
+				.data(createdService)
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
 	}
@@ -56,7 +56,7 @@ public class ServiceController {
 		ApiResponse<Map<String, Object>> apiResponse = ApiResponse.<Map<String, Object>>builder()
 				.code("service-s-01")
 				.message("Get all service successfully")
-				.result(response)
+				.data(response)
 				.build();
 
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
@@ -68,7 +68,7 @@ public class ServiceController {
 		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
 				.code("service-s-02")
 				.message("Get service successfully")
-				.result(service)
+				.data(service)
 				.build();
 
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
@@ -83,7 +83,7 @@ public class ServiceController {
 		ApiResponse<ServiceResponse> apiResponse = ApiResponse.<ServiceResponse>builder()
 				.code("service-s-04")
 				.message("Update service successfully")
-				.result(updatedService)
+				.data(updatedService)
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
 	}

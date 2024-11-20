@@ -14,13 +14,13 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    String firstname;
-    String lastname;
+    String id;
+    String email;
+    String displayName;
     boolean gender;
     LocalDate dob;
-    String username;
-    String phoneNum;
-    String email;
+    String phoneNumber;
+    String avatar;
     Timestamp createdAt;
     Set<Role> roles;
 }

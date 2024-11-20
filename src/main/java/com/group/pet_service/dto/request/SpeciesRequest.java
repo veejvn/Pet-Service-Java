@@ -5,11 +5,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshRequest {
-    @NotBlank(message = "Refresh token is required")
-    String refreshToken;
+public class SpeciesRequest {
+
+    @NotBlank(message = "Species name is required")
+    String name;
+
+    String description;
 }

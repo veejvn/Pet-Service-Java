@@ -22,13 +22,19 @@ spring:
           auth: true
           starttls:
             enable: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
 server:
   port: ${PORT}
 app:
   jwt:
-    signerKey: ${SINGER_KEY}
-    valid-duration: ${VALID_DURATION}
-    refresh-duration: ${REFRESH_DURATION}
+    access:
+      secret: ${SECRET_KEY}
+      duration: ${ACCESS_DURATION}
+    refresh:
+      secret: ${SECRET_KEY}
+      duration: ${REFRESH_DURATION}
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}

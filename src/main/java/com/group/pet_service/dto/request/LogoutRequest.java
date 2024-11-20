@@ -11,5 +11,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LogoutRequest {
     @NotNull(message = "Refresh token must be not null")
-    String token;
+    String refreshToken;
 }

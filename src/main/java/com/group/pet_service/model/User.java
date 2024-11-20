@@ -1,5 +1,7 @@
 package com.group.pet_service.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.group.pet_service.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,8 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,23 +22,30 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String firstname;
-    String lastname;
-    boolean gender;
-    LocalDate dob;
-    String username;
-    String password;
-    String phoneNum;
     String email;
+    String password;
+    String displayName;
+    LocalDate dob;
+    String phoneNumber;
+    String avatar;
     Timestamp createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-    Set<UserImage> images = new HashSet<>();
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-    Set<Token> tokens = new HashSet<>();
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
+    Set<Pet> pets = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "user",orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<Receipt> receipts = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "staff",orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<ServiceItem> items = new HashSet<>();
 
     @ElementCollection(targetClass =  Role.class, fetch = FetchType.EAGER)

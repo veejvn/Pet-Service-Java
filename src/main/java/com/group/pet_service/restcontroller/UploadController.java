@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/upload")
+@RequestMapping("api/uploads")
 @RequiredArgsConstructor
 public class UploadController {
 
@@ -26,7 +26,7 @@ public class UploadController {
                     .success(true)
                     .code("upload-s-01")
                     .message("Upload file successfully!")
-                    .result(imageUrl)
+                    .data(imageUrl)
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
         }catch (IOException e){
@@ -47,7 +47,7 @@ public class UploadController {
                     .success(true)
                     .code("upload-s-02")
                     .message("Upload successfully!")
-                    .result(imageUrls)
+                    .data(imageUrls)
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
         } catch (IOException e) {
@@ -76,7 +76,7 @@ public class UploadController {
                     .success(true)
                     .code("upload-s-03")
                     .message("Video upload successful")
-                    .result(videoUrl)
+                    .data(videoUrl)
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
         } catch (IOException e) {

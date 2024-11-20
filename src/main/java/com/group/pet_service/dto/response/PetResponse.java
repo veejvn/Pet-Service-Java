@@ -17,7 +17,6 @@ public class PetResponse {
     Long weight;
     Integer height;
     String description;
-    String speciesStr;
-    Set<String> imageUrl = new HashSet<>();
-
+    SpeciesResponse species;
+    Set<PetImage> images;
 }

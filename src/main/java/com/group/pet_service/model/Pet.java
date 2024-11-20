@@ -39,8 +39,10 @@ public class Pet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "species_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonManagedReference
     Species species;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    User user;
 }

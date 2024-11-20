@@ -43,7 +43,7 @@ public class ApplicationInitConfig {
 
             User admin = User.builder()
                     .email(ADMIN_EMAIL)
-                    .username("admin")
+                    .displayName("admin")
                     .password(passwordUtil.encodePassword(ADMIN_PASSWORD))
                     .roles(roles)
                     .build();

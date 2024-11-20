@@ -2,8 +2,8 @@ package com.group.pet_service.dto.request;
 
 import java.sql.Timestamp;
 
-import com.group.pet_service.enums.Status;
 
+import com.group.pet_service.enums.ServiceItemStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class ServiceItemRequest {
     private String id;
     
     @NotNull(message = "Status cannot be null")
-    private Status status;
+    private ServiceItemStatus status;
     
     @NotNull(message = "Quantity cannot be null")
     @Positive(message = "Quantity must be positive")
