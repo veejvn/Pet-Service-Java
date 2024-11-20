@@ -1,26 +1,24 @@
-package com.group.pet_service.dto.response;
+package com.group.pet_service.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class UserEditRequest {
     String id;
     String firstname;
     String lastname;
     boolean gender;
-    LocalDate dob;
-    String username;
-    String phoneNum;
     String email;
-    Timestamp createdAt;
-    Set<RoleResponse> roles;
+    LocalDate dob;
+    String password;
+    String phoneNum;
 }

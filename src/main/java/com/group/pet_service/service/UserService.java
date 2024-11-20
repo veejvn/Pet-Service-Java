@@ -4,10 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.group.pet_service.constant.PredefinedRole;
 import com.group.pet_service.dto.DataMailDTO;
-import com.group.pet_service.dto.request.ResendCodeRequest;
-import com.group.pet_service.dto.request.UserCreationRequest;
-import com.group.pet_service.dto.request.UserUpdateRequest;
-import com.group.pet_service.dto.request.UserVerifyCodeRequest;
+import com.group.pet_service.dto.request.*;
 import com.group.pet_service.dto.response.UserResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.exception.ErrorCode;
@@ -43,10 +40,17 @@ public class UserService {
     Cloudinary cloudinary;
     private final UserImageRepository userImageRepository;
 
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<UserResponse> getUsers(){
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+        return userRepository.findAll().stream().map(user -> {
+            UserResponse userResponse = userMapper.toUserResponse(user);
+            userResponse.setId(user.getId());
+            return userResponse;
+        }).toList();
     }
 
 
@@ -68,9 +72,14 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public void deleteUser(String userId){
-        userRepository.deleteById(userId);
+    @Transactional
+    public void deleteStaff(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+        userRepository.delete(user);
     }
+
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -111,4 +120,24 @@ public class UserService {
 
         userImageRepository.saveAll(userImages);
     }
+
+    @Transactional
+    public UserResponse updateStaff(UserEditRequest request) {
+        User existingUser = userRepository.findById(request.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+
+        existingUser.setFirstname(request.getFirstname());
+        existingUser.setLastname(request.getLastname());
+        existingUser.setGender(request.isGender());
+        existingUser.setDob(request.getDob());
+        existingUser.setPhoneNum(request.getPhoneNum());
+        existingUser.setPassword(request.getPassword());
+        existingUser.setEmail(request.getEmail());
+
+        userRepository.save(existingUser);
+
+        return userMapper.toUserResponse(existingUser);
+    }
+
 }

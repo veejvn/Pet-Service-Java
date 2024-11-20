@@ -17,8 +17,10 @@ public enum ErrorCode {
     SPECIES_NOT_EXISTED(1012,"This species not existed in database"),
     SERVICE_NOT_FOUND(1013,"This service does not existed in database"),
     NO_IMAGES_PROVIDED(1014, "No Image Found"),
-    PET_NOT_FOUND(1015,"This service does not existed in database"),
+    PET_NOT_FOUND(1015,"This pet does not existed in database"),
     IMAGE_UPLOAD_FAILED(1016,"failed to upload images"),
+    SPECIES_NOT_FOUND(1017,"Can not found species in database"),
+
 
     ;
 

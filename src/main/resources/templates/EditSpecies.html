@@ -13,17 +13,6 @@
     <link rel="stylesheet" th:href="@{/css/sb-admin-2.min.css}">
     <link rel="stylesheet" th:href="@{/css/sb-admin-2.css}">
     <link rel="stylesheet" th:href="@{/vendor/fontawesome-free/css/all.min.css}">
-    <style>
-        #imagePreview {
-            width: 200px;
-            /* Make sure the image is responsive */
-            height: 200px;
-            /* Limit the height */
-            display: none;
-            /* Initially hide the image preview */
-            border-radius: 50%;
-        }
-    </style>
 </head>
 
 <body id="page-top">
@@ -283,49 +272,37 @@
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                </div>
-
-                <!-- Content Row -->
-
-
-                <div class="row d-flex justify-content-center align-items-center mb-5">
+                <div class="row d-flex justify-content-center align-items-center">
                     <div class="card w-75 d-flex justify-content-center align-items-center p-5 shadow">
                         <div th:if="${errorMessage}" class="alert alert-danger">
                             <span th:text="${errorMessage}"></span>
                         </div>
-                        <h2>Adding New Services</h2>
-                        <form  th:action="@{/add-pet-image}" method="post" enctype="multipart/form-data">
+                        <h2>Edit Species</h2>
+                        <form class="w-75" th:action="@{/edit-species}" th:object="${request}" method="post">
+                            <!-- Species Name -->
+
                             <div class="mb-3">
-                                <label for="petId" class="form-label">Pet ID</label>
-                                <input type="text" class="form-control" id="petId" name="petId" placeholder="Enter Pet ID" required>
+                                <input type="hidden" class="form-control" id="id" th:field="*{id}" placeholder="Enter species name" required>
                             </div>
-                            <!-- Image Upload -->
                             <div class="mb-3">
-                                <label for="imageUpload" class="form-label">Upload Images</label>
-                                <input type="file" class="form-control" id="imageUpload" name="images" accept="image/*" required
-                                       multiple onchange="previewImages()">
+                                <label for="name" class="form-label">Species Name</label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Enter species name" required>
                             </div>
 
-                            <!-- Image Preview -->
-                            <div class="mb-3 justify-content-center align-items-center" id="imagePreviewContainer">
-                                <!-- Previews will appear here -->
+                            <!-- Species Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" placeholder="Enter species description" rows="4" required></textarea>
                             </div>
 
                             <!-- Submit Button -->
-                            <div class="d-flex justify-content-center align-items-center">
-                                <button type="submit" class="btn btn-primary">Add Images</button>
+                            <div class="w-100 d-flex justify-content-center align-items-center">
+                                <button type="submit" class="btn btn-primary p-3">Edit Species</button>
                             </div>
                         </form>
-
-
                     </div>
                 </div>
+
 
             </div>
             <!-- /.container-fluid -->
@@ -383,31 +360,6 @@
 
 <!-- Custom scripts for all pages-->
 <script th:src="@{js/sb-admin-2.min.js}"></script>
-
-<script>
-    function previewImages() {
-        const previewContainer = document.getElementById('imagePreviewContainer');
-        const files = document.getElementById('imageUpload').files;
-
-        // Clear any existing previews
-        previewContainer.innerHTML = '';
-
-        // Loop through selected files and generate image previews
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add('img-fluid', 'm-2');
-                img.style.maxWidth = '150px'; // Adjust preview size
-                previewContainer.appendChild(img);
-            };
-
-            reader.readAsDataURL(file);
-        });
-    }
-</script>
 
 </body>
 

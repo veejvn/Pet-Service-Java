@@ -28,10 +28,18 @@ public class SecurityConfig {
             "/admin",
             "/add-staff",
             "/add-staff-image",
+            "/edit-staff/**",
+            "/delete-staff/**",
             "/add-service",
+            "/edit-service/**",
+            "/delete-service/**",
             "/add-service-image",
             "/add-species",
+            "/edit-species/**",
+            "/delete-species/**",
             "/add-pet",
+            "/edit-pet/**",
+            "/delete-pet/**",
             "/add-pet-image",
     };
 
@@ -41,6 +49,7 @@ public class SecurityConfig {
             "/auth/refreshToken",
             "/auth/verify",
             "/greeting",
+            "/login",
     };
     private final String[] PUBLIC_GET_ENDPOINT = {
             "/users",
@@ -49,6 +58,7 @@ public class SecurityConfig {
             "img/**",
             "scss/**",
             "vendor/**",
+            "/login"
     };
 
     @Autowired

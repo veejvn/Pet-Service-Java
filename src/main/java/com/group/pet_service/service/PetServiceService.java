@@ -3,6 +3,8 @@ package com.group.pet_service.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.group.pet_service.dto.request.ServiceCreationRequest;
+import com.group.pet_service.dto.request.ServiceEditRequest;
+import com.group.pet_service.dto.response.ServiceResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.exception.ErrorCode;
 import com.group.pet_service.mapper.ServiceMapper;
@@ -79,5 +81,39 @@ public class PetServiceService {
         }
 
         serviceImageRepository.saveAll(serviceImages);
+    }
+
+    @Transactional
+    public PetService updateService(ServiceEditRequest request) {
+        PetService existingService = serviceRepository.findById(request.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+
+        // Check for unique name if changed
+        if (!existingService.getName().equals(request.getName())) {
+            var nameChecker = serviceRepository.findByName(request.getName());
+            if (nameChecker.isPresent()) {
+                throw new AppException(ErrorCode.SERVICE_EXISTED);
+            }
+            existingService.setName(request.getName());
+        }
+
+        existingService.setDescription(request.getDescription());
+        existingService.setPrice(request.getPrice());
+        existingService.setDisabled(request.isDisabled());
+
+        return serviceRepository.save(existingService);
+    }
+    public PetService getServiceById(String id) {
+        return serviceRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+    }
+
+    public List<ServiceResponse> getAll(){
+        return serviceRepository.findAll().stream().map(serviceMapper::toServiceResponse).toList();
+    }
+
+    public void deleteService(String id){
+       PetService service = serviceRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+        serviceRepository.delete(service);
     }
 }

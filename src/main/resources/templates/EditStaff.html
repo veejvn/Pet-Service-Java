@@ -13,17 +13,6 @@
     <link rel="stylesheet" th:href="@{/css/sb-admin-2.min.css}">
     <link rel="stylesheet" th:href="@{/css/sb-admin-2.css}">
     <link rel="stylesheet" th:href="@{/vendor/fontawesome-free/css/all.min.css}">
-    <style>
-        #imagePreview {
-            width: 200px;
-            /* Make sure the image is responsive */
-            height: 200px;
-            /* Limit the height */
-            display: none;
-            /* Initially hide the image preview */
-            border-radius: 50%;
-        }
-    </style>
 </head>
 
 <body id="page-top">
@@ -284,48 +273,72 @@
             <!-- Begin Page Content -->
             <div class="container-fluid">
 
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                </div>
-
-                <!-- Content Row -->
-
-
-                <div class="row d-flex justify-content-center align-items-center mb-5">
+                <div class="row d-flex justify-content-center align-items-center">
                     <div class="card w-75 d-flex justify-content-center align-items-center p-5 shadow">
                         <div th:if="${errorMessage}" class="alert alert-danger">
                             <span th:text="${errorMessage}"></span>
                         </div>
-                        <h2>Adding New Services</h2>
-                        <form  th:action="@{/add-pet-image}" method="post" enctype="multipart/form-data">
+                        <h2>Edit Staff</h2>
+                        <form class="w-75" th:action="@{/edit-staff}" th:object="${user}" method="post">
+                            <!-- First Name -->
                             <div class="mb-3">
-                                <label for="petId" class="form-label">Pet ID</label>
-                                <input type="text" class="form-control" id="petId" name="petId" placeholder="Enter Pet ID" required>
+                                <input type="hidden" class="form-control" id="id" th:field="*{id}" placeholder="Enter id" required>
                             </div>
-                            <!-- Image Upload -->
                             <div class="mb-3">
-                                <label for="imageUpload" class="form-label">Upload Images</label>
-                                <input type="file" class="form-control" id="imageUpload" name="images" accept="image/*" required
-                                       multiple onchange="previewImages()">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" th:field="*{firstname}" placeholder="Enter first name" required>
                             </div>
 
-                            <!-- Image Preview -->
-                            <div class="mb-3 justify-content-center align-items-center" id="imagePreviewContainer">
-                                <!-- Previews will appear here -->
+                            <!-- Last Name -->
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" th:field="*{lastname}" placeholder="Enter last name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Enter password" required>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Enter email" required>
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div class="mb-3">
+                                <label for="dob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob" th:field="*{dob}" required>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="mb-3 d-flex">
+                                <label class="form-label mr-3">Gender</label><br>
+                                <div class="form-check mr-3">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" value="true" id="genderMale" required>
+                                    <label class="form-check-label" for="genderMale">Male</label>
+                                </div>
+                                <div class="form-check mr-3">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" value="false" id="genderFemale" required>
+                                    <label class="form-check-label" for="genderFemale">Female</label>
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="mb-5">
+                                <label for="phoneNum" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phoneNum" th:field="*{phoneNum}" placeholder="Enter phone number" required>
                             </div>
 
                             <!-- Submit Button -->
-                            <div class="d-flex justify-content-center align-items-center">
-                                <button type="submit" class="btn btn-primary">Add Images</button>
+                            <div class="w-100 d-flex justify-content-center align-items-center">
+                                <button type="submit" class="btn btn-primary p-3">Edit Staff</button>
                             </div>
                         </form>
-
-
                     </div>
                 </div>
+
 
             </div>
             <!-- /.container-fluid -->
@@ -383,31 +396,6 @@
 
 <!-- Custom scripts for all pages-->
 <script th:src="@{js/sb-admin-2.min.js}"></script>
-
-<script>
-    function previewImages() {
-        const previewContainer = document.getElementById('imagePreviewContainer');
-        const files = document.getElementById('imageUpload').files;
-
-        // Clear any existing previews
-        previewContainer.innerHTML = '';
-
-        // Loop through selected files and generate image previews
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add('img-fluid', 'm-2');
-                img.style.maxWidth = '150px'; // Adjust preview size
-                previewContainer.appendChild(img);
-            };
-
-            reader.readAsDataURL(file);
-        });
-    }
-</script>
 
 </body>
 

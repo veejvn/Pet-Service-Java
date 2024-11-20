@@ -25,7 +25,7 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/pet-service/admin">
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
@@ -274,97 +274,80 @@
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                </div>
 
-                <!-- Content Row -->
-                <div class="row">
+                <div class="row" id="main-content">
+                    <div class="container-fluid mt-4">
+                        <h2>User List</h2>
+                        <a href="/pet-service/add-staff" class="btn btn-primary">+ Add Staff</a>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Username</th>
+                                <th scope="col">First Name</th>
+                                <th scope="col">Last Name</th>
+                                <th scope="col">Gender</th>
+                                <th scope="col">Date of Birth</th>
+                                <th scope="col">Phone Number</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Roles</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                            <!-- User data will be inserted dynamically -->
+                            </tbody>
+                        </table>
 
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Earnings (Monthly)</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h2>Service List</h2>
+                        <a href="/pet-service/add-service" class="btn btn-primary">+ Add Service</a>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Service Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="serviceTableBody">
+                            <!-- Service data will be inserted dynamically -->
+                            </tbody>
+                        </table>
+
+                        <h2>Pet List</h2>
+                        <a href="/pet-service/add-pet" class="btn btn-primary">+ Add Pet</a>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Pet Name</th>
+                                <th scope="col">Weight</th>
+                                <th scope="col">Height</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Species</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="petTableBody">
+                            <!-- Service data will be inserted dynamically -->
+                            </tbody>
+                        </table>
+
+                        <h2>Species List</h2>
+                        <a href="/pet-service/add-species" class="btn btn-primary">+ Add Species</a>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Species Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="speciesTableBody">
+                            <!-- Service data will be inserted dynamically -->
+                            </tbody>
+                        </table>
                     </div>
 
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-success shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Earnings (Annual)</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-info shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
-                                        </div>
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col-auto">
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                            </div>
-                                            <div class="col">
-                                                <div class="progress progress-sm mr-2">
-                                                    <div class="progress-bar bg-info" role="progressbar"
-                                                         style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                         aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pending Requests Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-warning shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            Pending Requests</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -408,7 +391,7 @@
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
+                <a class="btn btn-primary" onclick="handleLogout()">Logout</a>
             </div>
         </div>
     </div>
@@ -420,9 +403,181 @@
 
 <!-- Core plugin JavaScript-->
 <script th:src="@{vendor/jquery-easing/jquery.easing.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <!-- Custom scripts for all pages-->
 <script th:src="@{js/sb-admin-2.min.js}"></script>
+
+<script>
+    var token = '[[${session.loggedInUser.token} ?: '']]' ;
+        if (!token) {
+            alert('No token found, please log in.');
+        } else {
+        localStorage.setItem('token', token);
+
+        }
+
+        // Fetch user data from the API with the Bearer token
+        fetch('http://localhost:8080/pet-service/users', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 1000) {
+                const users = data.result;
+
+                // Get table body to insert rows dynamically
+                const tableBody = document.getElementById('userTableBody');
+
+                users.forEach(user => {
+                    // Create a new row for each user
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.firstname ? user.firstname : 'N/A'}</td>
+                        <td>${user.lastname ? user.lastname : 'N/A'}</td>
+                        <td>${user.gender ? 'Male' : 'Female'}</td>
+                        <td>${user.dob ? user.dob : 'N/A'}</td>
+                        <td>${user.phoneNum ? user.phoneNum : 'N/A'}</td>
+                        <td>${user.email ? user.email : 'N/A'}</td>
+                        <td>${user.roles ? user.roles.map(role => role.name).join(', ') : 'N/A'}</td>
+                        <td>
+                            <a href="/pet-service/edit-staff/${user.id}" class="btn btn-primary btn-sm">Edit</a>
+                            <form action="/pet-service/delete-staff/${user.id}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                            </form>
+                        </td>
+                    `;
+
+                    // Append the row to the table body
+                    tableBody.appendChild(row);
+                });
+            } else {
+                alert('Failed to load users');
+            }
+        })
+        .catch(error => console.error('Error fetching user data:', error));
+    fetch('http://localhost:8080/pet-service/api/services', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.code === 1000) {
+            const services = data.result;
+            const tableBody = document.getElementById('serviceTableBody');
+
+            services.forEach(service => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${service.name}</td>
+                    <td>${service.price ? service.price : 'N/A'}</td>
+                    <td>${service.description ? service.description : 'N/A'}</td>
+                    <td>
+                        <a href="/pet-service/edit-service/${service.id}" class="btn btn-primary btn-sm">Edit</a>
+                        <form action="/pet-service/delete-service/${service.id}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this service?')">Delete</button>
+                        </form>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        } else {
+            alert('Failed to load services');
+        }
+    })
+    .catch(error => console.error('Error fetching service data:', error));
+
+
+    fetch('http://localhost:8080/pet-service/api/pets', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer ' + token
+    }
+})
+.then(response => response.json())
+.then(data => {
+    if (data.code === 1000) {
+        const pets = data.result;
+        const tableBody = document.getElementById('petTableBody');
+
+        pets.forEach(pet => { // Iterate over 'pets' instead of 'services'
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${pet.name}</td>
+                <td>${pet.weight ? pet.weight : 'N/A'}</td>
+                <td>${pet.height ? pet.height : 'N/A'}</td>
+                <td>${pet.description ? pet.description : 'N/A'}</td>
+                <td>${pet.species.name ? pet.species.name : 'N/A'}</td>
+                <td>
+                    <a href="/pet-service/edit-pet/${pet.id}" class="btn btn-primary btn-sm">Edit</a> <!-- Adjust the link path if necessary -->
+                    <form action="/pet-service/delete-pet/${pet.id}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this pet?')">Delete</button>
+                    </form>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } else {
+        alert('Failed to load pets');
+    }
+})
+.catch(error => console.error('Error fetching pet data:', error));
+
+
+    fetch('http://localhost:8080/pet-service/api/species', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer ' + token
+    }
+})
+.then(response => response.json())
+.then(data => {
+    if (data.code === 1000) {
+        const pets = data.result;
+        const tableBody = document.getElementById('speciesTableBody');
+
+        pets.forEach(pet => { // Iterate over 'pets' instead of 'services'
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${pet.name}</td>
+                <td>${pet.description ? pet.description : 'N/A'}</td>
+                <td>
+                    <a href="/pet-service/edit-species/${pet.id}" class="btn btn-primary btn-sm">Edit</a> <!-- Adjust the link path if necessary -->
+                    <form action="/pet-service/delete-species/${pet.id}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this pet?')">Delete</button>
+                    </form>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } else {
+        alert('Failed to load pets');
+    }
+})
+.catch(error => console.error('Error fetching pet data:', error));
+
+
+    function handleLogout() {
+        // Remove the token from localStorage
+        localStorage.removeItem('token');
+
+        // Redirect to the logout endpoint
+        window.location.href = '/pet-service/logout'; // Adjust this URL to match your logout endpoint
+    }
+</script>
 
 </body>
 

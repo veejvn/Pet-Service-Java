@@ -2,8 +2,11 @@ package com.group.pet_service.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.group.pet_service.dto.request.PetEditRequest;
 import com.group.pet_service.dto.request.PetRequest;
 import com.group.pet_service.dto.request.ServiceCreationRequest;
+import com.group.pet_service.dto.response.PetResponse;
+import com.group.pet_service.dto.response.SpeciesResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.exception.ErrorCode;
 import com.group.pet_service.mapper.ServiceMapper;
@@ -26,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,5 +92,58 @@ public class PetService {
         }
 
         petImageRepository.saveAll(petImages);
+    }
+
+    @Transactional
+    public Pet updatePet(PetEditRequest request) {
+        Pet existingPet = petRepository.findById(request.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.PET_NOT_FOUND));
+
+        // Update pet details
+        existingPet.setName(request.getName());
+        existingPet.setDescription(request.getDescription());
+        existingPet.setHeight(request.getHeight());
+        existingPet.setWeight(request.getWeight());
+
+        // Check if species exists
+        Species species = speciesRepository.findById(request.getSpeciesId())
+                .orElseThrow(() -> new AppException(ErrorCode.SPECIES_NOT_EXISTED));
+        existingPet.setSpecies(species);
+
+        // Check if user exists
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        existingPet.setUser(user);
+
+        return petRepository.save(existingPet);
+    }
+    @Transactional
+    public void deletePet(String id) {
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PET_NOT_FOUND));
+
+        petRepository.delete(pet);
+    }
+    public Pet getPetById(String id) {
+        return petRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PET_NOT_FOUND));
+    }
+
+    public List<PetResponse> getAll() {
+
+        return petRepository.findAll().stream().map(pet -> {
+            return PetResponse.builder()
+                    .id(pet.getId())
+                    .name(pet.getName())
+                    .weight(pet.getWeight())
+                    .height(pet.getHeight())
+                    .description(pet.getDescription())
+                    .species(SpeciesResponse.builder()
+                            .id(pet.getSpecies().getId())
+                            .name(pet.getSpecies().getName())
+                            .description(pet.getSpecies().getDescription())
+                            .build())
+                    .build();
+        }).toList();
     }
 }
