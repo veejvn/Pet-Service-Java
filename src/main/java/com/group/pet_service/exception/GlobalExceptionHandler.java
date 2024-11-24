@@ -6,46 +6,66 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(ErrorCode.UNCATEGORIZE_EXCEPTION.getCode());
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZE_EXCEPTION.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    ResponseEntity<ApiResponse<Void>> handlingException(Exception e) {
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .success(false)
+                .code("global-e-01")
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(value = AppException.class)
-    ResponseEntity<ApiResponse> handlingAppException(AppException exception){
-        ErrorCode errorCode = exception.getErrorCode();
-
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    ResponseEntity<ApiResponse<Void>> handlingAppException(AppException e) {
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .success(false)
+                .message(e.getMessage())
+                .code(e.getCode())
+                .build();
+        return ResponseEntity.status(e.getStatus()).body(response);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception){
-        String enumKey = exception.getFieldError().getDefaultMessage();
+    ResponseEntity<ApiResponse<Void>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField().toUpperCase() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining(", "));
 
-        ErrorCode errorCode = ErrorCode.INVALID_KEY;
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .success(false)
+                .message(errorMessage)
+                .code("global-e-02")
+                .build();
+        return ResponseEntity.status(400).body(response);
+    }
 
-        try {
-            errorCode = ErrorCode.valueOf(enumKey);
-        } catch (IllegalArgumentException e){}
+    @ExceptionHandler(value = AuthenticationException.class)
+    ResponseEntity<ApiResponse<Void>> handlingAuthenticationException(AuthenticationException e) {
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .success(false)
+                .code("auth-e-01")
+                .message("Authentication failed: " + e.getMessage())
+                .build();
+        return ResponseEntity.status(401).body(response); // 401 Unauthorized
+    }
 
-        ApiResponse apiResponse = new ApiResponse();
-
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<ApiResponse<Void>> handlingAccessDeniedException(AccessDeniedException e) {
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .success(false)
+                .code("auth-e-02")
+                .message("Access denied: " + e.getMessage())
+                .build();
+        return ResponseEntity.status(403).body(response); // 403 Forbidden
     }
 }

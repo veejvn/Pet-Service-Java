@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ServiceRepository extends JpaRepository<PetService, String> {
+public interface PetServiceRepository extends JpaRepository<PetService, String> {
     Optional<PetService> findByName(String s);
 }

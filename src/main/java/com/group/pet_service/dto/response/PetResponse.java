@@ -1,11 +1,11 @@
 package com.group.pet_service.dto.response;
 
 import com.group.pet_service.model.PetImage;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import com.group.pet_service.model.Species;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -14,7 +14,7 @@ import java.util.Set;
 public class PetResponse {
     String id;
     String name;
-    Double weight;
+    Float weight;
     Integer height;
     String description;
     SpeciesResponse species;

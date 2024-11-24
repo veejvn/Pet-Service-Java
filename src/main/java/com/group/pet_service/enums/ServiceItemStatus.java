@@ -1,6 +1,6 @@
 package com.group.pet_service.enums;
 
-public enum Status {
+public enum ServiceItemStatus {
     PENDING,
     CONFIRMED,
     SHIPPED,

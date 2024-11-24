@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,5 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RefreshRequest {
-    String token;
+    @NotBlank(message = "Refresh token is required")
+    String refreshToken;
 }

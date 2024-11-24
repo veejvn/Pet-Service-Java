@@ -12,13 +12,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreationRequest {
-    String firstname;
-    String lastname;
-    boolean gender;
-    LocalDate dob;
-    String username;
-    String password;
-    String phoneNum;
     String email;
-    Timestamp createdAt;
+    String password;
+    String displayName;
+    LocalDate dob;
+    String phoneNumber;
 }

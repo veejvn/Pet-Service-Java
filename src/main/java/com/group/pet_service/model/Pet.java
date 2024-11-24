@@ -1,6 +1,8 @@
 package com.group.pet_service.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,9 +26,17 @@ public class Pet {
     String description;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<PetImage> images = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<Receipt> receipts = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference
@@ -34,6 +44,5 @@ public class Pet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "species_id")
-    @JsonBackReference
     Species species;
 }

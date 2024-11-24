@@ -1,0 +1,48 @@
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: true
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
+server:
+  port: ${PORT}
+app:
+  jwt:
+    access:
+      secret: ${SECRET_KEY}
+      duration: ${ACCESS_DURATION}
+    refresh:
+      secret: ${SECRET_KEY}
+      duration: ${REFRESH_DURATION}
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+  clientReceiveTokensPath: ${CLIENT_RECEIVE_TOKENS_PATH}
+  cloudinary:
+    cloud:
+      name: ${CLOUDINARY_NAME}
+    api:
+      key: ${CLOUDINARY_API_KEY}
+      secret: ${CLOUDINARY_API_SECRET}
+    folder: ${CLOUDINARY_FOLDER}

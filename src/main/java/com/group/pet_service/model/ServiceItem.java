@@ -1,7 +1,7 @@
 package com.group.pet_service.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.group.pet_service.enums.Status;
+import com.group.pet_service.enums.ServiceItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,9 +18,9 @@ public class ServiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Status status;
+    ServiceItemStatus status;
     int quantity;
-    double totalCost;
+    double totalPrice;
     Timestamp start;
     Timestamp end;
 
@@ -38,4 +38,9 @@ public class ServiceItem {
     @JoinColumn(name = "staff_id")
     @JsonBackReference
     User staff;
+
+    @PrePersist
+    protected void onCreate(){
+        this.status = ServiceItemStatus.PENDING;
+    }
 }

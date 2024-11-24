@@ -2,6 +2,7 @@ package com.group.pet_service.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,10 +22,13 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     int totalItem;
-    double totalCost;
+    double totalPriceReceipt;
     Timestamp createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "receipt", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
     Set<ServiceItem> items = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,7 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationResponse {
-    String token;
-    boolean authenticated;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class AuthResponse {
+    String accessToken;
+    String refreshToken;
 }

@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.response;
 
+import com.group.pet_service.enums.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,13 +15,12 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     String id;
-    String firstname;
-    String lastname;
+    String email;
+    String displayName;
     boolean gender;
     LocalDate dob;
-    String username;
-    String phoneNum;
-    String email;
+    String phoneNumber;
+    String avatar;
     Timestamp createdAt;
-    Set<RoleResponse> roles;
+    Set<Role> roles;
 }

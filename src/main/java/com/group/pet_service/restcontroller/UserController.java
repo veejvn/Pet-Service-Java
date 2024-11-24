@@ -1,70 +1,64 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.request.UserCreationRequest;
 import com.group.pet_service.dto.request.UserUpdateRequest;
+import com.group.pet_service.dto.request.UserUpgradeToStaffRequest;
 import com.group.pet_service.dto.response.ApiResponse;
 import com.group.pet_service.dto.response.UserResponse;
-import com.group.pet_service.mapper.UserMapper;
-import com.group.pet_service.service.AuthenticationService;
 import com.group.pet_service.service.UserService;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
 
-    UserMapper userMapper;
-    @GetMapping
-    public ApiResponse<List<UserResponse>> getUsers(){
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        log.info("Username: {}", authentication.getName());
-        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
+    @PutMapping
+    public ResponseEntity<ApiResponse<UserResponse>> updateInfo(@RequestBody @Valid UserUpdateRequest request){
+        ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
+                .code("user-s-01")
+                .message("Updated user info successfully")
+                .data(userService.updateInfo(request))
                 .build();
-    }
-    @GetMapping("/{userId}")
-    ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(userId))
-                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
-    @GetMapping("/my-info")
-    ApiResponse<UserResponse> getMyInfo() {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getMyInfo())
+    @GetMapping()
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(){
+        ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
+                .code("user-s-02")
+                .message("Get user info successfully")
+                .data(userService.getUser())
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @PostMapping("/upgrade-to-staff")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UserResponse>> upgradeToStaff(@RequestBody @Valid UserUpgradeToStaffRequest request){
+        ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
+                .code("user-s-03")
+                .message("Update to staff successfully")
+                .data(userService.updateToStaff(request))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @DeleteMapping("/{userId}")
-    ApiResponse<String> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String userId) {
         userService.deleteStaff(userId);
-        return ApiResponse.<String>builder().result("User has been deleted").build();
-    }
-
-    @PutMapping("/{userId}")
-    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.updateUser(userId, request))
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .code("user-s-04")
+                .message("Delete user successfully")
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-
 }

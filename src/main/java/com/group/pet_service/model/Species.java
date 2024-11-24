@@ -1,5 +1,7 @@
 package com.group.pet_service.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +22,7 @@ public class Species {
     String name;
     String description;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "species", orphanRemoval = true)
-    Set<Pet> pets = new HashSet<>();
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "species", orphanRemoval = true)
+//    @JsonBackReference
+//    Set<Pet> pets = new HashSet<>();
 }

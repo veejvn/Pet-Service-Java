@@ -1,7 +1,6 @@
 package com.group.pet_service.model;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,14 +11,16 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Token {
+public class RefreshToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String refreshToken;
-    boolean role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(length = 1000)
+    String token;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
     User user;
 }
