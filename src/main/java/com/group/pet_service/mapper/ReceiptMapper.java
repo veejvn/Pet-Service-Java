@@ -1,11 +1,12 @@
 package com.group.pet_service.mapper;
 
-import com.group.pet_service.dto.pet_service.PetServiceResponse;
+import com.group.pet_service.dto.admin.StaffResponse;
 import com.group.pet_service.dto.receipt.ReceiptResponse;
-import com.group.pet_service.model.PetService;
 import com.group.pet_service.model.Receipt;
-import com.group.pet_service.model.ServiceItem;
+import com.group.pet_service.model.PetServiceItem;
+import com.group.pet_service.model.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -14,7 +15,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ReceiptMapper {
 
-    ReceiptResponse.ServiceItemDTO toServiceItemDTO(ServiceItem serviceItem);
+    @Mapping(source = "jobPosition.name", target = "jobPosition")
+    StaffResponse toStaffResponse(User user);
+
+    ReceiptResponse.PetServiceItemDTO toServiceItemDTO(PetServiceItem petServiceItem);
 
     ReceiptResponse toReceiptResponse(Receipt receipt);
 
@@ -23,4 +27,6 @@ public interface ReceiptMapper {
                 .map(this::toReceiptResponse).toList();
         return new PageImpl<>(receiptResponses, receiptPage.getPageable(), receiptPage.getTotalPages());
     }
+
+    List<ReceiptResponse> toListReceiptResponse(List<Receipt> receipts);
 }

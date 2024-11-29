@@ -19,18 +19,15 @@ public class ReceiptCreateRequest {
 
     @NotEmpty(message = "At least one service item is required")
     @Size(min = 1, message = "Min 1")
-    Set<@Valid ServiceItemDTO> items;
+    Set<@Valid PetServiceItemDTO> items;
 
     @Data
-    public static class ServiceItemDTO {
+    public static class PetServiceItemDTO {
         @NotBlank(message = "Staff is required")
         String staffId;
 
         @NotBlank(message = "Service is required")
         String serviceId;
-
-        @NotNull(message = "Quantity is required")
-        int quantity;
 
         @NotNull(message = "Start time is required")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

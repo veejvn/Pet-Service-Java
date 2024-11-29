@@ -29,7 +29,7 @@ public class Receipt {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonManagedReference
-    Set<ServiceItem> items = new HashSet<>();
+    Set<PetServiceItem> items = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

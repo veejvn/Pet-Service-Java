@@ -14,13 +14,11 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ServiceItem {
+public class PetServiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     ServiceItemStatus status;
-    int quantity;
-    Double totalPrice;
     Timestamp start;
     Timestamp end;
 

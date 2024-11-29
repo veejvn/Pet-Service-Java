@@ -1,5 +1,6 @@
 package com.group.pet_service.dto.receipt;
 
+import com.group.pet_service.dto.admin.StaffResponse;
 import com.group.pet_service.dto.pet.PetResponse;
 import com.group.pet_service.dto.pet_service.PetServiceResponse;
 import com.group.pet_service.dto.user.UserResponse;
@@ -18,19 +19,16 @@ public class ReceiptResponse {
     Integer totalItem;
     Double totalPriceReceipt;
     Timestamp createdAt;
-    Set<ServiceItemDTO> items;
+    Set<PetServiceItemDTO> items;
     UserResponse user;
     PetResponse pet;
 
     @Data
-    public static class ServiceItemDTO {
-        String id;
+    public static class PetServiceItemDTO {
         ServiceItemStatus status;
-        int quantity;
-        double totalPrice;
         Timestamp start;
         Timestamp end;
-        UserResponse staff;
+        StaffResponse staff;
         PetServiceResponse service;
     }
 }

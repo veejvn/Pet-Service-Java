@@ -5,7 +5,6 @@ import com.group.pet_service.dto.pet.PetResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.PetMapper;
 import com.group.pet_service.model.Pet;
-import com.group.pet_service.model.PetImage;
 import com.group.pet_service.model.Species;
 import com.group.pet_service.repository.PetRepository;
 import com.group.pet_service.repository.SpeciesRepository;
@@ -14,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

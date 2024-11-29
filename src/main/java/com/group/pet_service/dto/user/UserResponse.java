@@ -17,7 +17,6 @@ public class UserResponse {
     String id;
     String email;
     String displayName;
-    boolean gender;
     LocalDate dob;
     String phoneNumber;
     String avatar;

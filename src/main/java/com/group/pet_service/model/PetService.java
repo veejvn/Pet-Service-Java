@@ -27,7 +27,7 @@ public class PetService {
     String image;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "petService", orphanRemoval = true)
-    Set<ServiceItem> items = new HashSet<>();
+    Set<PetServiceItem> items = new HashSet<>();
 
     @Override
     public String toString() {

@@ -22,7 +22,7 @@ public class Pet {
     String id;
     String name;
     Double weight;
-    Integer height;
+    String age;
     String description;
     String image;
 
