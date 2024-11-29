@@ -1,11 +1,14 @@
 package com.group.pet_service.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,4 +20,10 @@ public class JobPosition {
     String id;
 
     String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobPosition", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
+    Set<User> users = new HashSet<>();
 }

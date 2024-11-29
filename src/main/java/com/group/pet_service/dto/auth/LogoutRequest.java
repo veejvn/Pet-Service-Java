@@ -1,0 +1,15 @@
+package com.group.pet_service.dto.auth;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class LogoutRequest {
+    @NotNull(message = "Refresh token must be not null")
+    String refreshToken;
+}

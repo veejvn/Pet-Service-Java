@@ -1,12 +1,9 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.auth.UserInfoResponse;
-import com.group.pet_service.dto.auth.ChangePasswordRequest;
-import com.group.pet_service.dto.auth.ForgotPasswordRequest;
-import com.group.pet_service.dto.auth.VerifyForgotPasswordRequest;
-import com.group.pet_service.dto.request.*;
-import com.group.pet_service.dto.response.ApiResponse;
-import com.group.pet_service.dto.response.AuthResponse;
+import com.group.pet_service.dto.auth.*;
+import com.group.pet_service.dto.api.ApiResponse;
+import com.group.pet_service.dto.auth.AuthResponse;
+import com.group.pet_service.dto.token.RefreshRequest;
 import com.group.pet_service.service.AuthenticationService;
 import com.group.pet_service.service.EmailService;
 import com.group.pet_service.util.CodeUtil;
@@ -42,11 +39,11 @@ public class AuthenticationController {
     EmailService emailService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid AuthRequest request){
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid AuthRequest request) {
         authenticationService.register(request);
         String verificationCode = UUID.randomUUID().toString();
         codeUtil.save(verificationCode, request, 3);
-        emailService.sendEmailToVerifyRegister(request.getEmail(),verificationCode);
+        emailService.sendEmailToVerifyRegister(request.getEmail(), verificationCode);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .code("auth-s-01")
                 .message("Request register successfully, check your email")
@@ -55,7 +52,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/register/verify/{verificationCode}")
-    public RedirectView verifyRegister(@PathVariable String verificationCode){
+    public RedirectView verifyRegister(@PathVariable String verificationCode) {
         AuthRequest request = codeUtil.get(verificationCode);
         AuthResponse authResponse = authenticationService.verifyRegister(request);
         codeUtil.remove(verificationCode);
@@ -67,7 +64,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody @Valid AuthLoginRequest request){
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody @Valid AuthLoginRequest request) {
         var result = authenticationService.login(request);
         ApiResponse<AuthResponse> apiResponse = ApiResponse.<AuthResponse>builder()
                 .code("auth-s-02")
@@ -89,13 +86,13 @@ public class AuthenticationController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@RequestBody @Valid RefreshRequest request) {
-         AuthResponse authResponse = authenticationService.refreshToken(request);
-         ApiResponse<AuthResponse> apiResponse = ApiResponse.<AuthResponse>builder()
+        AuthResponse authResponse = authenticationService.refreshToken(request);
+        ApiResponse<AuthResponse> apiResponse = ApiResponse.<AuthResponse>builder()
                 .code("auth-s-4")
                 .message("Refresh new access token successfully")
                 .data(authResponse)
                 .build();
-         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @PreAuthorize("isAuthenticated()")

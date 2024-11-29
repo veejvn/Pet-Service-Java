@@ -1,10 +1,11 @@
 package com.group.pet_service.service;
 
-import com.group.pet_service.dto.request.ReceiptCreateRequest;
-import com.group.pet_service.dto.response.ReceiptResponse;
+import com.group.pet_service.dto.receipt.ReceiptCreateRequest;
+import com.group.pet_service.dto.receipt.ReceiptResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.ReceiptMapper;
 import com.group.pet_service.model.Pet;
+import com.group.pet_service.model.PetService;
 import com.group.pet_service.model.Receipt;
 import com.group.pet_service.model.ServiceItem;
 import com.group.pet_service.model.User;
@@ -14,6 +15,8 @@ import com.group.pet_service.repository.PetServiceRepository;
 import com.group.pet_service.repository.UserRepository;
 import com.group.pet_service.util.UserUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -50,12 +53,12 @@ public class ReceiptService {
             User staff = userRepository.findById(serviceItemDTO.getStaffId()).orElseThrow(
                     () -> new AppException(HttpStatus.NOT_FOUND, "Staff not found", "user-e-03")
             );
-            com.group.pet_service.model.Service service = petServiceRepository.findById(serviceItemDTO.getServiceId()).orElseThrow(
+            PetService petService = petServiceRepository.findById(serviceItemDTO.getServiceId()).orElseThrow(
                     () -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-e-01")
             );
             int quantity = serviceItemDTO.getQuantity();
             totalItem += quantity;
-            double totalPrice = service.getPrice() * quantity;
+            double totalPrice = petService.getPrice() * quantity;
             totalPriceReceipt += totalPrice;
             Timestamp start = serviceItemDTO.getStart();
             Timestamp end = serviceItemDTO.getEnd();
@@ -64,7 +67,7 @@ public class ReceiptService {
                     .totalPrice(totalPrice)
                     .start(start)
                     .end(end)
-                    .service(service)
+                    .petService(petService)
                     .receipt(receipt)
                     .staff(staff)
                     .build();
@@ -77,4 +80,8 @@ public class ReceiptService {
         return receiptMapper.toReceiptResponse(receipt);
     }
 
+    public Page<ReceiptResponse> findAll(Pageable pageable) {
+        Page<Receipt> receipts = receiptRepository.findAll(pageable);
+        return receiptMapper.toPetServiceResponsePage(receipts);
+    }
 }

@@ -21,8 +21,4 @@ public class Species {
     String id;
     String name;
     String description;
-
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "species", orphanRemoval = true)
-//    @JsonBackReference
-//    Set<Pet> pets = new HashSet<>();
 }

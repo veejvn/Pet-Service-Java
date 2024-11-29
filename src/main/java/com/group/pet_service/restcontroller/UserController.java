@@ -1,9 +1,9 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.request.UserUpdateRequest;
-import com.group.pet_service.dto.request.UserUpgradeToStaffRequest;
-import com.group.pet_service.dto.response.ApiResponse;
-import com.group.pet_service.dto.response.UserResponse;
+import com.group.pet_service.dto.user.UserUpdateRequest;
+import com.group.pet_service.dto.user.UserUpgradeToStaffRequest;
+import com.group.pet_service.dto.api.ApiResponse;
+import com.group.pet_service.dto.user.UserResponse;
 import com.group.pet_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -22,7 +22,7 @@ public class UserController {
     UserService userService;
 
     @PutMapping
-    public ResponseEntity<ApiResponse<UserResponse>> updateInfo(@RequestBody @Valid UserUpdateRequest request){
+    public ResponseEntity<ApiResponse<UserResponse>> updateInfo(@RequestBody @Valid UserUpdateRequest request) {
         ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
                 .code("user-s-01")
                 .message("Updated user info successfully")
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(){
+    public ResponseEntity<ApiResponse<UserResponse>> getUser() {
         ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
                 .code("user-s-02")
                 .message("Get user info successfully")
@@ -43,7 +43,7 @@ public class UserController {
 
     @PostMapping("/upgrade-to-staff")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<UserResponse>> upgradeToStaff(@RequestBody @Valid UserUpgradeToStaffRequest request){
+    public ResponseEntity<ApiResponse<UserResponse>> upgradeToStaff(@RequestBody @Valid UserUpgradeToStaffRequest request) {
         ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
                 .code("user-s-03")
                 .message("Update to staff successfully")
@@ -54,7 +54,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String userId) {
-        userService.deleteStaff(userId);
+        userService.delete(userId);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .code("user-s-04")
                 .message("Delete user successfully")

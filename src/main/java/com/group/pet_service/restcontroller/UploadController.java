@@ -1,6 +1,6 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.response.ApiResponse;
+import com.group.pet_service.dto.api.ApiResponse;
 import com.group.pet_service.service.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class UploadController {
     private final UploadService uploadService;
 
     @PostMapping("/image")
-    public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("image") MultipartFile image){
+    public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("image") MultipartFile image) {
         try {
             String imageUrl = uploadService.uploadFile(image);
             ApiResponse<String> apiResponse = ApiResponse.<String>builder()
@@ -29,7 +29,7 @@ public class UploadController {
                     .data(imageUrl)
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        }catch (IOException e){
+        } catch (IOException e) {
             ApiResponse<String> apiResponse = ApiResponse.<String>builder()
                     .success(false)
                     .code("upload-e-01")
@@ -61,8 +61,8 @@ public class UploadController {
     }
 
     @PostMapping("/video")
-    public ResponseEntity<ApiResponse<String>> uploadVideo(@RequestParam("video") MultipartFile video){
-        if(video.getSize() > 50 * 1024 * 1024){ //MB -> bit
+    public ResponseEntity<ApiResponse<String>> uploadVideo(@RequestParam("video") MultipartFile video) {
+        if (video.getSize() > 50 * 1024 * 1024) { //MB -> bit
             ApiResponse<String> apiResponse = ApiResponse.<String>builder()
                     .success(false)
                     .code("upload-e-03")

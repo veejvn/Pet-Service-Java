@@ -1,10 +1,8 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.request.PetRequest;
-import com.group.pet_service.dto.request.SpeciesRequest;
-import com.group.pet_service.dto.response.ApiResponse;
-import com.group.pet_service.dto.response.PetResponse;
-import com.group.pet_service.dto.response.SpeciesResponse;
+import com.group.pet_service.dto.species.SpeciesRequest;
+import com.group.pet_service.dto.api.ApiResponse;
+import com.group.pet_service.dto.species.SpeciesResponse;
 import com.group.pet_service.service.SpeciesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,7 @@ public class SpeciesController {
     private final SpeciesService speciesService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SpeciesResponse>> create(@RequestBody @Valid SpeciesRequest request){
+    public ResponseEntity<ApiResponse<SpeciesResponse>> create(@RequestBody @Valid SpeciesRequest request) {
         ApiResponse<SpeciesResponse> apiResponse = ApiResponse.<SpeciesResponse>builder()
                 .code("species-s-1")
                 .message("Create species successfully")
@@ -32,7 +30,7 @@ public class SpeciesController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SpeciesResponse>>> getAll(){
+    public ResponseEntity<ApiResponse<List<SpeciesResponse>>> getAll() {
         ApiResponse<List<SpeciesResponse>> apiResponse = ApiResponse.<List<SpeciesResponse>>builder()
                 .code("species-s-2")
                 .message("Get all species successfully")
@@ -42,7 +40,7 @@ public class SpeciesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SpeciesResponse>> get(@PathVariable String id){
+    public ResponseEntity<ApiResponse<SpeciesResponse>> get(@PathVariable String id) {
         ApiResponse<SpeciesResponse> apiResponse = ApiResponse.<SpeciesResponse>builder()
                 .code("species-s-3")
                 .message("Get species successfully")
@@ -52,7 +50,7 @@ public class SpeciesController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id){
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         speciesService.delete(id);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .code("species-s-4")

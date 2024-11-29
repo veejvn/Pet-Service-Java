@@ -20,7 +20,7 @@ public class ServiceItem {
     String id;
     ServiceItemStatus status;
     int quantity;
-    double totalPrice;
+    Double totalPrice;
     Timestamp start;
     Timestamp end;
 
@@ -40,7 +40,7 @@ public class ServiceItem {
     User staff;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.status = ServiceItemStatus.PENDING;
     }
 }

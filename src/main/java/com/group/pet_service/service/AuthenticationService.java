@@ -1,13 +1,9 @@
 package com.group.pet_service.service;
 
-import com.group.pet_service.dto.auth.ChangePasswordRequest;
-import com.group.pet_service.dto.auth.ForgotPasswordRequest;
-import com.group.pet_service.dto.auth.UserInfoResponse;
-import com.group.pet_service.dto.auth.VerifyForgotPasswordRequest;
+import com.group.pet_service.dto.auth.*;
 import com.group.pet_service.dto.jwt.JWTPayloadDto;
-import com.group.pet_service.dto.request.*;
-import com.group.pet_service.dto.response.AuthResponse;
-import com.group.pet_service.dto.response.UserResponse;
+import com.group.pet_service.dto.auth.AuthResponse;
+import com.group.pet_service.dto.token.RefreshRequest;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.enums.Role;
 import com.group.pet_service.mapper.UserMapper;
@@ -43,14 +39,14 @@ public class AuthenticationService {
     UserUtil userUtil;
     PasswordUtil passwordUtil;
 
-    public void register(AuthRequest request){
+    public void register(AuthRequest request) {
         boolean existedUser = userRepository.existsByEmail(request.getEmail());
-        if(existedUser){
+        if (existedUser) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Email has existed", "auth-e-01");
         }
     }
 
-    public AuthResponse verifyRegister(AuthRequest request){
+    public AuthResponse verifyRegister(AuthRequest request) {
         register(request);
 
         String hashedPassword = passwordUtil.encodePassword(request.getPassword());
@@ -100,11 +96,11 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void logout(LogoutRequest request){
+    public void logout(LogoutRequest request) {
         JWTPayloadDto jwtPayloadDto = refreshTokenUtil.verifyToken(request.getRefreshToken());
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(jwtPayloadDto.getId())
                 .orElseThrow(
-                    () -> new AppException(HttpStatus.NOT_FOUND, "Refresh token not found", "auth-e-05")
+                        () -> new AppException(HttpStatus.NOT_FOUND, "Refresh token not found", "auth-e-05")
                 );
         refreshToken.setToken(null);
         refreshTokenRepository.save(refreshToken);
@@ -119,13 +115,13 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void changePassword(ChangePasswordRequest request){
+    public void changePassword(ChangePasswordRequest request) {
         String userId = userUtil.getUserId();
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(HttpStatus.NOT_FOUND, "User not found", "auth-e-06")
         );
         boolean isMatchPassword = passwordUtil.checkPassword(request.getCurrentPassword(), user.getPassword());
-        if(!isMatchPassword){
+        if (!isMatchPassword) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Wrong current password", "auth-e-07");
         }
         String newPassword = passwordUtil.encodePassword(request.getNewPassword());
@@ -163,7 +159,6 @@ public class AuthenticationService {
                 );
         return userMapper.toUserInfoResponse(user);
     }
-
 
 
 //    public void verifyCode(

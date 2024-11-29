@@ -1,114 +1,97 @@
 package com.group.pet_service.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.group.pet_service.dto.request.ServiceCreationRequest;
-import com.group.pet_service.dto.request.ServiceEditRequest;
-import com.group.pet_service.dto.response.ServiceResponse;
-import com.group.pet_service.exception.AppException;
-import com.group.pet_service.mapper.ServiceMapper;
-import com.group.pet_service.model.PetService;
-import com.group.pet_service.model.ServiceImage;
-import com.group.pet_service.repository.ServiceImageRepository;
-import com.group.pet_service.repository.PetServiceRepository;
-import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Service
-@Builder
+import com.group.pet_service.dto.pet_service.PetServiceCreationRequest;
+import com.group.pet_service.dto.pet_service.PetServiceResponse;
+import com.group.pet_service.exception.AppException;
+import com.group.pet_service.mapper.PetServiceMapper;
+import com.group.pet_service.model.PetService;
+import com.group.pet_service.model.ServiceImage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.group.pet_service.dto.pet.PetServiceRequest;
+import com.group.pet_service.repository.PetServiceRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PetServiceService {
-    Cloudinary cloudinary;
-    PetServiceRepository petServiceRepository;
-    ServiceMapper serviceMapper;
-    ServiceImageRepository serviceImageRepository;
+    private final PetServiceRepository petServiceRepository;
+    private final PetServiceMapper petServiceMapper;
+    private final UploadService uploadService;
 
-    public PetService createService(ServiceCreationRequest request) {
-        var serviceChecker = petServiceRepository.findByName(request.getName());
-        if (serviceChecker.isPresent())
-            throw new AppException(ErrorCode.SERVICE_EXISTED);
-
-        PetService petService = serviceMapper.toService(request);
-
-        petService.setCreateAt(new Timestamp(System.currentTimeMillis()));
-
-        return petServiceRepository.save(petService);
+    public Page<PetServiceResponse> getAllServices(Pageable pageable) {
+        return petServiceRepository.findAll(pageable)
+                .map(petServiceMapper::toDTO);
     }
 
-    @Transactional
-    public void addImagesToService(String serviceId, MultipartFile[] images) throws IOException {
-        // Find the PetService by ID or throw an exception if not found
-        PetService petService = petServiceRepository.findById(serviceId)
-                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
-//        testCloudinary();
-        Set<ServiceImage> serviceImages = new HashSet<>();
-
-        for (MultipartFile image : images) {
-            try {
-                // Upload image to Cloudinary
-                Map<String, Object> uploadResult = cloudinary.uploader()
-                        .upload(image.getBytes(), ObjectUtils.asMap("folder", "pet_service_images/"));
-
-                // Extract the secure URL of the uploaded image
-                String url = (String) uploadResult.get("secure_url");
-
-                // Create a ServiceImage entity and associate it with the PetService
-                ServiceImage serviceImage = ServiceImage.builder()
-                        .url(url)
-                        .petService(petService)
-                        .build();
-
-                serviceImages.add(serviceImage);
-            } catch (Exception e) {
-                throw new AppException(ErrorCode.IMAGE_UPLOAD_FAILED);
-            }
-        }
-
-        serviceImageRepository.saveAll(serviceImages);
-    }
-
-    @Transactional
-    public PetService updateService(ServiceEditRequest request) {
-        PetService existingService = petServiceRepository.findById(request.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
-
-        // Check for unique name if changed
-        if (!existingService.getName().equals(request.getName())) {
-            var nameChecker = petServiceRepository.findByName(request.getName());
-            if (nameChecker.isPresent()) {
-                throw new AppException(ErrorCode.SERVICE_EXISTED);
-            }
-            existingService.setName(request.getName());
-        }
-
-        existingService.setDescription(request.getDescription());
-        existingService.setPrice(request.getPrice());
-        existingService.setDisabled(request.isDisabled());
-
-        return petServiceRepository.save(existingService);
-    }
-
-    public PetService getServiceById(String id) {
+    public PetServiceResponse getServiceById(String id) {
         return petServiceRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+                .map(petServiceMapper::toDTO)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01"));
     }
 
-    public List<ServiceResponse> getAll() {
-        return petServiceRepository.findAll().stream().map(serviceMapper::toServiceResponse).toList();
+    @Transactional
+    public void createPetService(PetServiceRequest request) throws IOException {
+        PetService petService = petServiceMapper.toEntity(request);
+        String image = uploadService.uploadFile(request.getImageFile());
+        petService.setImage(image);
+        petServiceRepository.save(petService);
     }
 
+    @Transactional
+    public PetServiceResponse updateService(String id, PetServiceRequest petServiceRequest) {
+        // Tìm dịch vụ theo ID
+        PetService existingService = petServiceRepository.findById(id)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01"));
+
+        // Cập nhật thông tin từ ServiceDTO vào thực thể đã tồn tại
+        petServiceMapper.updateEntityFromDTO(petServiceRequest, existingService);
+
+        // Lưu và cập nhật dịch vụ
+        PetService updatedService = petServiceRepository.save(existingService);
+
+        // Chuyển đổi thực thể đã cập nhật sang DTO để trả về
+        return petServiceMapper.toDTO(updatedService);
+    }
+
+    @Transactional
     public void deleteService(String id) {
-        PetService service = petServiceRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
-        petServiceRepository.delete(service);
+        if (!petServiceRepository.existsById(id)) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01");
+        }
+        petServiceRepository.deleteById(id);
+    }
+
+    public Page<PetServiceResponse> findAll(Pageable pageable) {
+        Page<PetService> petServices = petServiceRepository.findAll(pageable);
+        return petServiceMapper.toPetServiceResponsePage(petServices);
+    }
+
+    public List<PetServiceResponse> getLatestServices(int count) {
+        List<PetService> latestServices = petServiceRepository.findAll(Sort.by(Sort.Direction.DESC, "createAt"))
+                .stream()
+                .limit(count)
+                .toList();
+        return latestServices.stream()
+                .map(petServiceMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Page<PetServiceResponse> findAllByDisabledFalse(Pageable pageable) {
+        Page<PetService> petServices = petServiceRepository.findAllByDisabledFalse(pageable);
+        return petServiceMapper.toPetServiceResponsePage(petServices);
     }
 }

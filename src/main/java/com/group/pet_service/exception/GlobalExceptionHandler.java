@@ -1,6 +1,6 @@
 package com.group.pet_service.exception;
 
-import com.group.pet_service.dto.response.ApiResponse;
+import com.group.pet_service.dto.api.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

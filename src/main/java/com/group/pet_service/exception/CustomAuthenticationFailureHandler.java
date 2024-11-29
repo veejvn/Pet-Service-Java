@@ -18,14 +18,16 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
 
-        String errorMessage = "Invalid email or password";
+        String email = request.getParameter("email"); // Lấy email từ request
 
-        if (exception instanceof UsernameNotFoundException) {
-            errorMessage = "Email account not found";
-        } else if (exception instanceof BadCredentialsException) {
-            errorMessage = "Invalid password";
+        String errorMessage = "";
+
+        if (exception instanceof BadCredentialsException) {
+            errorMessage = "Invalid email or password";
         }
+        String redirectUrl = "/admin/login?error=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8) +
+                "&email=" + URLEncoder.encode(email != null ? email : "", StandardCharsets.UTF_8);
 
-        response.sendRedirect("/admin/login?error=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8));
+        response.sendRedirect(redirectUrl);
     }
 }

@@ -24,12 +24,7 @@ public class Pet {
     Double weight;
     Integer height;
     String description;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet", orphanRemoval = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonManagedReference
-    Set<PetImage> images = new HashSet<>();
+    String image;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet", orphanRemoval = true)
     @EqualsAndHashCode.Exclude

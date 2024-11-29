@@ -1,8 +1,8 @@
 package com.group.pet_service.restcontroller;
 
-import com.group.pet_service.dto.request.PetRequest;
-import com.group.pet_service.dto.response.ApiResponse;
-import com.group.pet_service.dto.response.PetResponse;
+import com.group.pet_service.dto.pet.PetRequest;
+import com.group.pet_service.dto.api.ApiResponse;
+import com.group.pet_service.dto.pet.PetResponse;
 import com.group.pet_service.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class PetController {
     private final PetService petService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PetResponse>> create(@RequestBody @Valid PetRequest request){
+    public ResponseEntity<ApiResponse<PetResponse>> create(@RequestBody @Valid PetRequest request) {
         ApiResponse<PetResponse> apiResponse = ApiResponse.<PetResponse>builder()
                 .code("pet-s-1")
                 .message("Create pet successfully")
@@ -30,7 +30,7 @@ public class PetController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PetResponse>> get(@PathVariable String id){
+    public ResponseEntity<ApiResponse<PetResponse>> get(@PathVariable String id) {
         ApiResponse<PetResponse> apiResponse = ApiResponse.<PetResponse>builder()
                 .code("pet-s-2")
                 .message("Get pet successfully")
@@ -40,7 +40,7 @@ public class PetController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PetResponse>>> getAll(){
+    public ResponseEntity<ApiResponse<List<PetResponse>>> getAll() {
         ApiResponse<List<PetResponse>> apiResponse = ApiResponse.<List<PetResponse>>builder()
                 .code("pet-s-3")
                 .message("Get pets successfully")
@@ -50,7 +50,7 @@ public class PetController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<PetResponse>> update(@RequestBody @Valid PetRequest request, @PathVariable String id){
+    public ResponseEntity<ApiResponse<PetResponse>> update(@RequestBody @Valid PetRequest request, @PathVariable String id) {
         ApiResponse<PetResponse> apiResponse = ApiResponse.<PetResponse>builder()
                 .code("pet-s-4")
                 .message("Update pet successfully")
@@ -60,7 +60,7 @@ public class PetController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id){
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         petService.delete(id);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .code("pet-s-5")

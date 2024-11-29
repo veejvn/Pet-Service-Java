@@ -2,7 +2,7 @@ package com.group.pet_service.configuration;
 
 
 import com.group.pet_service.exception.CustomAuthenticationFailureHandler;
-import com.group.pet_service.service.UserDetailsServiceImpl;
+import com.group.pet_service.service.impl.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -36,7 +35,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final String[] POST_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login"};
-    private final String[] GET_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login", "/js/**", "/css/**", "/error", "/api/**"};
+    private final String[] GET_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login", "/js/**", "/css/**", "/api/**", "/img/**", "/scss/**", "/vendor/**"};
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -114,8 +113,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("admin/logout")
-                        .logoutSuccessUrl("admin/login")
+                        .logoutUrl("/admin/logout")
+                        .logoutSuccessUrl("/admin/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
