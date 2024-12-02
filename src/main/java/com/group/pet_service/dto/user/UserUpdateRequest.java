@@ -13,8 +13,6 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
     String displayName;
-    boolean gender;
-    @JsonFormat(pattern = "dd/MM/yyyy")
     LocalDate dob;
     String phoneNumber;
     String avatar;
