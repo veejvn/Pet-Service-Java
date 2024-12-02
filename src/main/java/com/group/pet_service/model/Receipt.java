@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,8 +23,8 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     Integer totalItem;
-    Double totalPriceReceipt;
-    Timestamp createdAt;
+    Integer totalPriceReceipt;
+    LocalDateTime createdAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "receipt", orphanRemoval = true)
     @EqualsAndHashCode.Exclude

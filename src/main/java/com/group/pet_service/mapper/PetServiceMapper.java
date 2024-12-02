@@ -1,7 +1,7 @@
 package com.group.pet_service.mapper;
 
+import com.group.pet_service.dto.pet_service.PetServiceEditRequest;
 import com.group.pet_service.dto.pet.PetServiceRequest;
-import com.group.pet_service.dto.pet_service.PetServiceCreationRequest;
 import com.group.pet_service.dto.pet_service.PetServiceResponse;
 import com.group.pet_service.model.PetService;
 import org.mapstruct.Mapper;
@@ -20,7 +20,7 @@ public interface PetServiceMapper {
     PetService toEntity(PetServiceRequest request);
 
     @Mapping(target = "image", ignore = true)
-    void updateEntityFromDTO(PetServiceRequest request, @MappingTarget PetService petService);
+    void updateEntityFromDTO(@MappingTarget PetService petService, PetServiceEditRequest request);
 
     PetServiceResponse toPetServiceResponse(PetService petService);
 
@@ -31,4 +31,6 @@ public interface PetServiceMapper {
     }
 
     ;
+
+    PetServiceEditRequest toPetServiceEditRequest(PetService petService);
 }

@@ -20,7 +20,7 @@ public class PetService {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    Double price;
+    Integer price;
     Boolean disabled;
     String description;
     Timestamp createAt;

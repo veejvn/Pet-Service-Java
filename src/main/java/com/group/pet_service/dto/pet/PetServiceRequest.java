@@ -22,7 +22,7 @@ public class PetServiceRequest {
 
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
-    private Double price;
+    private Integer price;
     private Boolean disabled;
     private String description;
     private MultipartFile imageFile;

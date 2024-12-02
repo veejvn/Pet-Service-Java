@@ -1,10 +1,10 @@
 package com.group.pet_service.mapper;
 
-import com.group.pet_service.dto.admin.StaffEditRequest;
-import com.group.pet_service.dto.admin.StaffResponse;
+import com.group.pet_service.dto.staff.StaffEditRequest;
+import com.group.pet_service.dto.staff.StaffResponse;
 import com.group.pet_service.dto.auth.UserInfoResponse;
 import com.group.pet_service.dto.jwt.JWTPayloadDto;
-import com.group.pet_service.dto.admin.StaffCreationRequest;
+import com.group.pet_service.dto.staff.StaffCreationRequest;
 import com.group.pet_service.dto.user.UserUpdateRequest;
 import com.group.pet_service.dto.user.UserResponse;
 import com.group.pet_service.enums.Role;
@@ -48,4 +48,7 @@ public interface UserMapper {
 
     @Mapping(source = "jobPosition.id", target = "jobPositionId")
     StaffEditRequest toStaffEditRequest(User user);
+
+    @Mapping(target = "avatar", ignore = true)
+    void updateStaffInfo(@MappingTarget User staff, StaffEditRequest request);
 }

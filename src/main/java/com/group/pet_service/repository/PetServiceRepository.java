@@ -12,5 +12,7 @@ import java.util.Optional;
 public interface PetServiceRepository extends JpaRepository<PetService, String> {
     Optional<PetService> findByName(String s);
 
-    Page<PetService> findAllByDisabledFalse(Pageable pageable);
+    Page<PetService> findAllByOrderByCreateAtDesc(Pageable pageable);
+
+    Page<PetService> findAllByDisabledFalseOrderByCreateAtDesc(Pageable pageable);
 }

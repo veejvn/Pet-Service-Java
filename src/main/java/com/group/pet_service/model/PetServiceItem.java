@@ -1,12 +1,12 @@
 package com.group.pet_service.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.group.pet_service.enums.ServiceItemStatus;
+import com.group.pet_service.enums.PetServiceItemStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -18,9 +18,12 @@ public class PetServiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    ServiceItemStatus status;
-    Timestamp start;
-    Timestamp end;
+    LocalDateTime start;
+    LocalDateTime end;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    PetServiceItemStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id")
@@ -39,6 +42,6 @@ public class PetServiceItem {
 
     @PrePersist
     protected void onCreate() {
-        this.status = ServiceItemStatus.PENDING;
+        this.status = PetServiceItemStatus.PENDING;
     }
 }

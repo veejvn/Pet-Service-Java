@@ -1,19 +1,18 @@
-package com.group.pet_service.dto.admin;
+package com.group.pet_service.dto.staff;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StaffCreationRequest {
-    String email;
-    String password;
+public class StaffEditRequest {
     String displayName;
     String phoneNumber;
-    MultipartFile avatar;
+    String avatar;
+    MultipartFile avatarFile;
     String jobPositionId;
 }

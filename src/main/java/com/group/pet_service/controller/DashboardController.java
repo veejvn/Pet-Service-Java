@@ -1,15 +1,18 @@
 package com.group.pet_service.controller;
 
-import com.group.pet_service.dto.admin.JobPositionRequest;
-import com.group.pet_service.dto.admin.JobPositionResponse;
-import com.group.pet_service.dto.admin.StaffEditRequest;
-import com.group.pet_service.dto.admin.StaffResponse;
+import com.group.pet_service.dto.job_position.JobPositionEditRequest;
+import com.group.pet_service.dto.job_position.JobPositionRequest;
+import com.group.pet_service.dto.job_position.JobPositionResponse;
 import com.group.pet_service.dto.pet.PetServiceRequest;
+import com.group.pet_service.dto.pet_service.PetServiceEditRequest;
 import com.group.pet_service.dto.pet_service.PetServiceResponse;
 import com.group.pet_service.dto.receipt.ReceiptResponse;
+import com.group.pet_service.dto.species.SpeciesEditRequest;
 import com.group.pet_service.dto.species.SpeciesRequest;
 import com.group.pet_service.dto.species.SpeciesResponse;
-import com.group.pet_service.dto.admin.StaffCreationRequest;
+import com.group.pet_service.dto.staff.StaffCreationRequest;
+import com.group.pet_service.dto.staff.StaffEditRequest;
+import com.group.pet_service.dto.staff.StaffResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.model.User;
 import com.group.pet_service.repository.UserRepository;
@@ -73,6 +76,20 @@ public class DashboardController {
         return "Dashboard";
     }
 
+    @GetMapping("/detail-receipt/{id}")
+    public String showPageDetail(@PathVariable("id") String id, Model model,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            ReceiptResponse receiptResponse = receiptService.findById(id);
+            model.addAttribute("receiptResponse", receiptResponse);
+            return "DetailReceipt";
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/dashboard";
+        }
+
+    }
+
     @GetMapping("/add-staff")
     @PreAuthorize("hasRole('ADMIN')")
     public String addStaff(Model model) {
@@ -107,7 +124,7 @@ public class DashboardController {
     @GetMapping("/list-staff")
     @PreAuthorize("hasRole('ADMIN')")
     public String showListStaff(Model model) {
-        List<StaffResponse> staffResponses = userService.findAll();
+        List<StaffResponse> staffResponses = userService.findAllStaffs();
         model.addAttribute("listStaff", staffResponses);
         return "ListStaff";
     }
@@ -120,6 +137,7 @@ public class DashboardController {
             List<JobPositionResponse> jobPositions = jobPositionService.findAll();
             model.addAttribute("staffEditRequest", request);
             model.addAttribute("jobPositions", jobPositions);
+            model.addAttribute("id", id);
             return "EditStaff";
         } catch (AppException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -193,55 +211,44 @@ public class DashboardController {
         return "ListPetService";
     }
 
-    //    @GetMapping("/edit-service/{id}")
-//    public String editService(@PathVariable String id, Model model) {
-//        try {
-//            // Fetch the service data by ID
-//            PetService existingService = petServiceService.getServiceById(id);
-//
-//            // Map the PetService entity to the ServiceEditRequest DTO (if needed)
-//            ServiceEditRequest serviceEditRequest = ServiceEditRequest.builder()
-//                    .id(existingService.getId())
-//                    .name(existingService.getName())
-//                    .description(existingService.getDescription())
-//                    .price(existingService.getPrice())
-//                    .disabled(existingService.isDisabled())
-//                    .build();
-//
-//            // Add the service data to the model
-//            model.addAttribute("service", serviceEditRequest);
-//        } catch (AppException e) {
-//            // Handle case when the service is not found
-//            model.addAttribute("errorMessage", "Service not found: " + e.getMessage());
-//        }
-//
-//        return "editService";  // Show the edit form with service data pre-filled
-//    }
-//
-//    @PostMapping("/edit-service")
-//    public String editService(@ModelAttribute ServiceEditRequest request, Model model) {
-//        try {
-//            // Attempt to update the service
-//            petServiceService.updateService(request);
-//        } catch (AppException e) {
-//            // If an error occurs, display the error message
-//            model.addAttribute("errorMessage", "Error while editing service: " + e.getMessage());
-//
-//            // Fetch and return the current service data to repopulate the form
-//            com.group.pet_service.model.PetService existingService = petServiceService.getServiceById(request.getId());
-//            model.addAttribute("service", ServiceEditRequest.builder()
-//                    .id(existingService.getId())
-//                    .name(existingService.getName())
-//                    .description(existingService.getDescription())
-//                    .price(existingService.getPrice())
-//                    .disabled(existingService.isDisabled())
-//                    .build());
-//
-//            return "editService";  // Stay on the same page with the error message
-//        }
-//
-//        return "redirect:/admin";  // Redirect to the admin page after success
-//    }
+    @GetMapping("/edit-pet-service/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showPageEditPetService(@PathVariable String id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            PetServiceEditRequest petServiceEditRequest = petServiceService.findById(id);
+            model.addAttribute("petServiceEditRequest", petServiceEditRequest);
+            model.addAttribute("id", id);
+            return "EditPetService";
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/list-pet-service";
+        }
+    }
+
+    @PostMapping("/edit-pet-service/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView editPetService(@ModelAttribute("petServiceEditRequest") PetServiceEditRequest request,
+                                       @PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            petServiceService.updateService(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Update pet service successfully");
+            modelAndView.setViewName("redirect:/admin/list-pet-service");
+        } catch (AppException | IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            modelAndView.setViewName("redirect:/admin/edit-pet-service/" + id);
+        }
+        return modelAndView;
+    }
+
+    @PostMapping("/delete-pet-service/{id}")
+    public ModelAndView deletePetService(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        petServiceService.delete(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Delete Pet service successfully");
+        modelAndView.setViewName("redirect:/admin/list-pet-service");
+        return modelAndView;
+    }
 
     @GetMapping("/add-species")
     public String addSpecies(Model model) {
@@ -264,68 +271,53 @@ public class DashboardController {
     }
 
     @GetMapping("/list-species")
-    public String showPageListSpecies(Model model) {
+    public String showListSpecies(Model model) {
         List<SpeciesResponse> species = speciesService.getAll();
         model.addAttribute("listSpecies", species);
         return "ListSpecies";
     }
 
-//    @GetMapping("/edit-species/{id}")
-//    public String editSpecies(@PathVariable String id, Model model) {
-//        try {
-//            // Fetch the species data by ID
-//            Species existingSpecies = speciesService.getSpeciesById(id);
-//
-//            // Map the Species entity to the SpeciesEditRequest DTO (if needed)
-//            SpeciesEditRequest speciesEditRequest = SpeciesEditRequest.builder()
-//                    .id(existingSpecies.getId())
-//                    .name(existingSpecies.getName())
-//                    .description(existingSpecies.getDescription())
-//                    .build();
-//
-//            model.addAttribute("request", speciesEditRequest);
-//        } catch (AppException e) {
-//            model.addAttribute("errorMessage", "Species not found: " + e.getMessage());
-//        }
-//
-//        return "editSpecies";  // Show the edit form with species data pre-filled
-//    }
-//
-//    @PostMapping("/edit-species")
-//    public String editSpecies(@ModelAttribute SpeciesEditRequest request, Model model) {
-//        try {
-//            speciesService.updateSpecies(request);
-//        } catch (AppException e) {
-//            // Catch exceptions and pass an error message to the frontend
-//            model.addAttribute("errorMessage", "Error while editing species: " + e.getMessage());
-//            return "editSpecies";  // Redirect back to the edit form page
-//        }
-//        return "redirect:/admin";
-//    }
-//
-//    @PostMapping("/delete-species/{id}")
-//    public String deleteSpecies(@PathVariable String id, Model model) {
-//        try {
-//            speciesService.deleteSpecies(id);
-//        } catch (AppException e) {
-//            // Pass an error message to the frontend
-//            model.addAttribute("errorMessage", "Error while deleting species: " + e.getMessage());
-//            return "admin";  // Return to admin page with an error message
-//        }
-//        return "redirect:/admin";
-//    }
-//
-//    @PostMapping("/delete-service/{id}")
-//    public String deleteService(@PathVariable String id, Model model) {
-//        try {
-//            petServiceService.deleteService(id);
-//        } catch (AppException e) {
-//            // Pass an error message to the frontend
-//            model.addAttribute("errorMessage", "Error while deleting species: " + e.getMessage());
-//            return "admin";  // Return to admin page with an error message
-//        }
-//        return "redirect:/admin";
-//    }
+    @GetMapping("/edit-species/{id}")
+    public String showPageEditSpecies(@PathVariable String id, RedirectAttributes redirectAttributes, Model model) {
+        try {
+            SpeciesEditRequest speciesEditRequest = speciesService.findById(id);
+            model.addAttribute("speciesEditRequest", speciesEditRequest);
+            model.addAttribute("id", id);
+            return "EditSpecies";
+        } catch (AppException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/list-species";
+        }
+    }
+
+    @PostMapping("/edit-species/{id}")
+    public ModelAndView editSpecies(@ModelAttribute("speciesEditRequest") SpeciesEditRequest request, @PathVariable String id,
+                                    RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            speciesService.update(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Update species successfully");
+            modelAndView.setViewName("redirect:/admin/list-species");
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            modelAndView.setViewName("redirect:/admin/list-species");
+        }
+        return modelAndView;
+    }
+
+    @PostMapping("/delete-species/{id}")
+    public ModelAndView deleteSpecies(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            speciesService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Delete species successfully");
+            modelAndView.setViewName("redirect:/admin/list-species");
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            modelAndView.setViewName("redirect:/admin/list-species");
+        }
+        return modelAndView;
+    }
 
     @GetMapping("/add-job-position")
     @PreAuthorize("hasRole('ADMIN')")
@@ -346,9 +338,9 @@ public class DashboardController {
             return modelAndView;
         }
         try {
-            jobPositionService.saveJobPosition(request);
+            jobPositionService.addJobPosition(request);
             redirectAttributes.addFlashAttribute("successMessage", "Thêm vị trí công việc thành công");
-            modelAndView.setViewName("redirect:/admin/add-staff");
+            modelAndView.setViewName("redirect:/admin/list-job-position");
             return modelAndView;
         } catch (AppException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -357,12 +349,48 @@ public class DashboardController {
         return modelAndView;
     }
 
-//    @GetMapping("/list-job-position")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public String showListJobPosition(Model model) {
-//        List<JobPositionResponse> responses = jobPositionService.findAll();
-//        model.addAttribute("listJobPosition", responses);
-//        return "ListJobPosition";
-//    }
+    @GetMapping("/list-job-position")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showListJobPosition(Model model) {
+        List<JobPositionResponse> responses = jobPositionService.findAll();
+        model.addAttribute("listJobPosition", responses);
+        return "ListJobPosition";
+    }
+
+    @GetMapping("/edit-job-position/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String showPageEditJobPosition(@PathVariable String id, Model model) {
+        JobPositionEditRequest jobPositionEditRequest = jobPositionService.findById(id);
+        model.addAttribute("jobPositionEditRequest", jobPositionEditRequest);
+        model.addAttribute("id", id);
+        return "EditJobPosition";
+    }
+
+    @PostMapping("/edit-job-position/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView editJobPosition(@ModelAttribute("jobPositionEditRequest") JobPositionEditRequest request,
+                                        @PathVariable String id, RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            jobPositionService.update(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Edit job position successfully");
+            modelAndView.setViewName("redirect:/admin/list-job-position");
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            modelAndView.setViewName("redirect:/admin/edit-job-position/" + id);
+        }
+        ;
+        return modelAndView;
+    }
+
+    @PostMapping("/delete-job-position/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView deleteJobPosition(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        ModelAndView modelAndView = new ModelAndView();
+        jobPositionService.delete(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Delete job position successfully");
+        modelAndView.setViewName("redirect:/admin/list-job-position");
+        return modelAndView;
+    }
 
 }

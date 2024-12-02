@@ -1,10 +1,9 @@
 package com.group.pet_service.service;
 
-import com.group.pet_service.dto.admin.StaffEditRequest;
-import com.group.pet_service.dto.admin.StaffResponse;
-import com.group.pet_service.dto.admin.StaffCreationRequest;
+import com.group.pet_service.dto.staff.StaffEditRequest;
+import com.group.pet_service.dto.staff.StaffResponse;
+import com.group.pet_service.dto.staff.StaffCreationRequest;
 import com.group.pet_service.dto.user.UserUpdateRequest;
-import com.group.pet_service.dto.user.UserUpgradeToStaffRequest;
 import com.group.pet_service.dto.user.UserResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.UserMapper;
@@ -18,6 +17,7 @@ import com.group.pet_service.util.UserUtil;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -58,19 +58,13 @@ public class UserService {
     }
 
     public void delete(String id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new AppException(HttpStatus.NOT_FOUND, "User not found")
-        );
-        userRepository.delete(user);
-    }
-
-    public UserResponse updateToStaff(UserUpgradeToStaffRequest request) {
-        User user = userRepository.findById(request.getId()).orElseThrow(
-                () -> new AppException(HttpStatus.NOT_FOUND, "User not found")
-        );
-        user.getRoles().add(Role.STAFF);
-        userRepository.save(user);
-        return userMapper.toUserResponse(user);
+        try {
+            userRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException("Cannot delete species: It is being referenced by other records.");
+        } catch (Exception e) {
+            throw new AppException("An unexpected error occurred while deleting species.");
+        }
     }
 
     public void addStaff(StaffCreationRequest request) throws IOException {
@@ -105,9 +99,13 @@ public class UserService {
         return userMapper.toStaffEditRequest(staff);
     }
 
-    public List<StaffResponse> findAll() {
-        List<User> staffs = userRepository.findAllByOrderByCreatedAtDesc();
-        return userMapper.toListStaffResponse(staffs);
+    public List<StaffResponse> findAllStaffs() {
+        List<User> allUsers = userRepository.findAllByOrderByCreatedAtDesc();
+        List<User> staffUsers = allUsers.stream()
+                .filter(user -> user.getRoles().contains(Role.STAFF))
+                .filter(user -> !"admin".equalsIgnoreCase(user.getDisplayName()))
+                .toList();
+        return userMapper.toListStaffResponse(staffUsers);
     }
 
     public void updateStaff(String id, StaffEditRequest request) throws IOException {
@@ -117,12 +115,12 @@ public class UserService {
         User staff = userRepository.findById(id).orElseThrow(
                 () -> new AppException(HttpStatus.NOT_FOUND, "Staff not found")
         );
-        if (!request.getAvatarFile().isEmpty()) {
+        userMapper.updateStaffInfo(staff, request);
+        if (request.getAvatarFile() != null && !request.getAvatarFile().isEmpty()) {
             String avatar = uploadService.uploadFile(request.getAvatarFile());
             staff.setAvatar(avatar);
         }
         staff.setJobPosition(jobPosition);
         userRepository.save(staff);
     }
-
 }

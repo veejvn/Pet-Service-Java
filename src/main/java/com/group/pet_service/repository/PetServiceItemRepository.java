@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.group.pet_service.model.PetServiceItem;
 
-public interface ServiceItemRepository extends JpaRepository<PetServiceItem, String> {
-    Page<PetServiceItem> findByReceiptId(String receiptId, Pageable pageable);
+import java.util.Optional;
 
-    Page<PetServiceItem> findByStaffId(String staffId, Pageable pageable);
+public interface PetServiceItemRepository extends JpaRepository<PetServiceItem, String> {
+    Optional<PetServiceItem> findByIdAndStaffId(String id, String staffId);
 }

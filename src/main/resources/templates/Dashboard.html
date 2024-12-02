@@ -20,15 +20,19 @@
                 <div class="container-fluid">
                     <div class="row" id="main-content">
                         <div class="container-fluid mt-4">
+                            <div th:if="${errorMessage}" class="alert alert-danger">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
                             <h2>Receipt List</h2>
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
                                     <th scope="col" class="py-2 px-4 border-b border-gray-300">Stt</th>
                                     <th scope="col" class="py-2 px-4 border-b border-gray-300">Customer</th>
+                                    <th scope="col" class="py-2 px-4 border-b border-gray-300">Pet</th>
                                     <th scope="col" class="py-2 px-4 border-b border-gray-300">Total Item</th>
                                     <th scope="col" class="py-2 px-4 border-b border-gray-300">Total Price</th>
-                                    <th scope="col" class="py-2 px-4 border-b border-gray-300">Pet</th>
+                                    <th scope="col" class="py-2 px-4 border-b border-gray-300">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody id="userTableBody">
@@ -38,11 +42,17 @@
                                     <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto"
                                         th:text="${receipt.user.displayName}"></td>
                                     <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto"
+                                        th:text="${receipt.pet.name}"></td>
+                                    <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto"
                                         th:text="${receipt.totalItem}"></td>
                                     <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto"
-                                        th:text="${receipt.totalPriceReceipt}"></td>
-                                    <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto"
-                                        th:text="${receipt.pet.name}"></td>
+                                        th:text="${receipt.totalPriceReceipt} + 'đ'"></td>
+                                    <td class="py-2 px-4 border-b border-gray-300 mx-auto my-auto">
+                                        <a th:href="@{'/admin/detail-receipt/' + ${receipt.id}}"
+                                           class="col btn btn-primary">
+                                            <i class="fas fa-info"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -78,26 +88,6 @@
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
 </a>
-
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="/admin/logout">Logout</a>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div th:replace="~{/fragment/Script :: scripts}"></div>
 

@@ -1,19 +1,14 @@
-package com.group.pet_service.dto.admin;
+package com.group.pet_service.dto.job_position;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Timestamp;
-
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StaffResponse {
+public class JobPositionResponse {
     String id;
-    String displayName;
-    String phoneNumber;
-    String avatar;
-    String jobPosition;
+    String name;
 }

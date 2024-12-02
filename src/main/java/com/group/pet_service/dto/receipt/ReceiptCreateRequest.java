@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -30,11 +31,9 @@ public class ReceiptCreateRequest {
         String serviceId;
 
         @NotNull(message = "Start time is required")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        Timestamp start;
+        LocalDateTime start;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @NotNull(message = "Start end is required")
-        Timestamp end;
+        LocalDateTime end;
     }
 }

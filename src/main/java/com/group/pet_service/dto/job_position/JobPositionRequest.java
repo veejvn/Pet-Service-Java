@@ -1,4 +1,4 @@
-package com.group.pet_service.dto.admin;
+package com.group.pet_service.dto.job_position;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;

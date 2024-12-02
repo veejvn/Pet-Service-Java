@@ -16,32 +16,24 @@
                 <div th:replace="~{/fragment/header :: navbar}"></div>
             </header>
             <main>
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <div class="row d-flex justify-content-center align-items-center">
                         <div class="card w-75 d-flex justify-content-center align-items-center p-5 shadow">
                             <div th:if="${errorMessage}" class="alert alert-danger">
                                 <span th:text="${errorMessage}"></span>
                             </div>
-                            <h2>Edit Species</h2>
-                            <form class="w-75" th:action="@{/admin/edit-species/{id}(id=${id})}"
-                                  th:object="${speciesEditRequest}" method="post">
+                            <h2>Update Info Staff</h2>
+                            <form class="w-75" th:action="@{/admin/edit-job-position/{id}(id=${id})}"
+                                  th:object="${jobPositionEditRequest}"
+                                  method="post">
+                                <!--Name -->
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Species Name</label>
-                                    <input type="text" class="form-control" id="name" th:field="*{name}"
-                                           placeholder="Enter species name" required>
+                                    <input type="text" class="form-control" th:field="*{name}"
+                                           placeholder="Enter name job position" required>
                                 </div>
-
-                                <!-- Species Description -->
-                                <div class="mb-3">
-                                    <label for="description" class="form-label">Description</label>
-                                    <textarea class="form-control" id="description" th:field="*{description}"
-                                              placeholder="Enter species description" rows="4" required></textarea>
-                                </div>
-
                                 <!-- Submit Button -->
                                 <div class="w-100 d-flex justify-content-center align-items-center">
-                                    <button type="submit" class="btn btn-primary p-3">Edit Species</button>
+                                    <button type="submit" class="btn btn-primary p-3">Update</button>
                                 </div>
                             </form>
                         </div>
@@ -62,6 +54,7 @@
 </a>
 
 <div th:replace="~{/fragment/Script :: scripts}"></div>
+
 </body>
 
 </html>

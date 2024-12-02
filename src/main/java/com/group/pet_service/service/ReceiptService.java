@@ -1,18 +1,19 @@
 package com.group.pet_service.service;
 
+import com.group.pet_service.dto.pet_service_item.ChangeStatusPetServiceItemRequest;
+import com.group.pet_service.dto.pet_service_item.PetServiceItemResponse;
 import com.group.pet_service.dto.receipt.ReceiptCreateRequest;
 import com.group.pet_service.dto.receipt.ReceiptResponse;
+import com.group.pet_service.enums.PetServiceItemStatus;
 import com.group.pet_service.exception.AppException;
+import com.group.pet_service.mapper.PetServiceItemMapper;
 import com.group.pet_service.mapper.ReceiptMapper;
 import com.group.pet_service.model.Pet;
 import com.group.pet_service.model.PetService;
 import com.group.pet_service.model.Receipt;
 import com.group.pet_service.model.PetServiceItem;
 import com.group.pet_service.model.User;
-import com.group.pet_service.repository.PetRepository;
-import com.group.pet_service.repository.ReceiptRepository;
-import com.group.pet_service.repository.PetServiceRepository;
-import com.group.pet_service.repository.UserRepository;
+import com.group.pet_service.repository.*;
 import com.group.pet_service.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +34,9 @@ public class ReceiptService {
     private final PetRepository petRepository;
     private final UserRepository userRepository;
     private final PetServiceRepository petServiceRepository;
+    private final PetServiceItemRepository petServiceItemRepository;
     private final ReceiptMapper receiptMapper;
+    private final PetServiceItemMapper petServiceItemMapper;
 
     public ReceiptResponse create(ReceiptCreateRequest request) {
         User user = userUtil.getUser();
@@ -42,25 +44,25 @@ public class ReceiptService {
                 () -> new AppException(HttpStatus.NOT_FOUND, "Pet not found", "pet-e-01")
         );
         Receipt receipt = Receipt.builder()
-                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                .createdAt(LocalDateTime.now())
                 .user(user)
                 .pet(pet)
                 .build();
 //        receiptRepository.save(receipt);
         int totalItem = 0;
-        double totalPriceReceipt = 0.0;
+        int totalPriceReceipt = 0;
         Set<PetServiceItem> items = new HashSet<>();
         for (ReceiptCreateRequest.PetServiceItemDTO serviceItemDTO : request.getItems()) {
             User staff = userRepository.findById(serviceItemDTO.getStaffId()).orElseThrow(
                     () -> new AppException(HttpStatus.NOT_FOUND, "Staff not found", "user-e-03")
             );
             PetService petService = petServiceRepository.findById(serviceItemDTO.getServiceId()).orElseThrow(
-                    () -> new AppException(HttpStatus.NOT_FOUND, "Service not found", "service-e-01")
+                    () -> new AppException(HttpStatus.NOT_FOUND, "Pet Service not found", "service-e-01")
             );
             totalItem += 1;
             totalPriceReceipt += petService.getPrice();
-            Timestamp start = serviceItemDTO.getStart();
-            Timestamp end = serviceItemDTO.getEnd();
+            LocalDateTime start = serviceItemDTO.getStart();
+            LocalDateTime end = serviceItemDTO.getEnd();
             PetServiceItem petServiceItem = PetServiceItem.builder()
                     .start(start)
                     .end(end)
@@ -83,8 +85,53 @@ public class ReceiptService {
         return receiptMapper.toListReceiptResponse(receipts);
     }
 
+    public List<ReceiptResponse> getReceiptByStaff() {
+        String id = userUtil.getUserId();
+        List<Receipt> receipts = receiptRepository.findDistinctByItems_Staff_Id(id);
+        return receiptMapper.toListReceiptResponse(receipts);
+    }
+
+    public PetServiceItemResponse staffChangeStatusPetServiceItem(String id, ChangeStatusPetServiceItemRequest request) {
+        String staffId = userUtil.getUserId();
+        PetServiceItem petServiceItem = petServiceItemRepository.findByIdAndStaffId(id, staffId).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Pet service item not found", "pet-service-item-e-01")
+        );
+
+        PetServiceItemStatus status = request.getStatus();
+
+        Set<PetServiceItemStatus> statuses = Set.of(
+                PetServiceItemStatus.CONFIRMED,
+                PetServiceItemStatus.COMPLETED,
+                PetServiceItemStatus.CANCELED
+        );
+
+        if (!statuses.contains(status)) {
+            throw new AppException(HttpStatus.FORBIDDEN, "You don't have permission to edit pet service item to this status.", "pet-service-item-e-02");
+        }
+
+        petServiceItem.setStatus(status);
+        petServiceItemRepository.save(petServiceItem);
+        return petServiceItemMapper.toPetServiceItemResponse(petServiceItem);
+    }
+
+    public PetServiceItemResponse userChangeStatusPetServiceItem(String id) {
+        PetServiceItem petServiceItem = petServiceItemRepository.findById(id).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Pet service item not found", "pet-service-item-e-01")
+        );
+        petServiceItem.setStatus(PetServiceItemStatus.CANCELED);
+        petServiceItemRepository.save(petServiceItem);
+        return petServiceItemMapper.toPetServiceItemResponse(petServiceItem);
+    }
+
     public Page<ReceiptResponse> findAll(Pageable pageable) {
-        Page<Receipt> receipts = receiptRepository.findAll(pageable);
+        Page<Receipt> receipts = receiptRepository.findAllByOrderByCreatedAtDesc(pageable);
         return receiptMapper.toPetServiceResponsePage(receipts);
+    }
+
+    public ReceiptResponse findById(String id) {
+        Receipt receipt = receiptRepository.findById(id).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Receipt not found")
+        );
+        return receiptMapper.toReceiptResponse(receipt);
     }
 }

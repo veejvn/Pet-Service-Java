@@ -1,19 +1,15 @@
 package com.group.pet_service.service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.group.pet_service.dto.pet_service.PetServiceCreationRequest;
+import com.group.pet_service.dto.pet_service.PetServiceEditRequest;
 import com.group.pet_service.dto.pet_service.PetServiceResponse;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.PetServiceMapper;
 import com.group.pet_service.model.PetService;
-import com.group.pet_service.model.ServiceImage;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -52,31 +48,34 @@ public class PetServiceService {
     }
 
     @Transactional
-    public PetServiceResponse updateService(String id, PetServiceRequest petServiceRequest) {
-        // Tìm dịch vụ theo ID
-        PetService existingService = petServiceRepository.findById(id)
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01"));
+    public void updateService(String id, PetServiceEditRequest request) throws IOException {
 
-        // Cập nhật thông tin từ ServiceDTO vào thực thể đã tồn tại
-        petServiceMapper.updateEntityFromDTO(petServiceRequest, existingService);
+        PetService petService = petServiceRepository.findById(id)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found"));
 
-        // Lưu và cập nhật dịch vụ
-        PetService updatedService = petServiceRepository.save(existingService);
-
-        // Chuyển đổi thực thể đã cập nhật sang DTO để trả về
-        return petServiceMapper.toDTO(updatedService);
+        petServiceMapper.updateEntityFromDTO(petService, request);
+        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
+            String imageCurrent = petService.getImage();
+            uploadService.deleteFile(imageCurrent);
+            String image = uploadService.uploadFile(request.getImageFile());
+            petService.setImage(image);
+        }
+        petServiceRepository.save(petService);
     }
 
     @Transactional
-    public void deleteService(String id) {
-        if (!petServiceRepository.existsById(id)) {
-            throw new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01");
+    public void delete(String id) {
+        try {
+            petServiceRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException("Cannot delete species: It is being referenced by other records.");
+        } catch (Exception e) {
+            throw new AppException("An unexpected error occurred while deleting species.");
         }
-        petServiceRepository.deleteById(id);
     }
 
     public Page<PetServiceResponse> findAll(Pageable pageable) {
-        Page<PetService> petServices = petServiceRepository.findAll(pageable);
+        Page<PetService> petServices = petServiceRepository.findAllByOrderByCreateAtDesc(pageable);
         return petServiceMapper.toPetServiceResponsePage(petServices);
     }
 
@@ -90,8 +89,15 @@ public class PetServiceService {
                 .collect(Collectors.toList());
     }
 
+    public PetServiceEditRequest findById(String id) {
+        PetService petService = petServiceRepository.findById(id).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found")
+        );
+        return petServiceMapper.toPetServiceEditRequest(petService);
+    }
+
     public Page<PetServiceResponse> findAllByDisabledFalse(Pageable pageable) {
-        Page<PetService> petServices = petServiceRepository.findAllByDisabledFalse(pageable);
+        Page<PetService> petServices = petServiceRepository.findAllByDisabledFalseOrderByCreateAtDesc(pageable);
         return petServiceMapper.toPetServiceResponsePage(petServices);
     }
 }
