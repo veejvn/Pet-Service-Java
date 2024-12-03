@@ -9,8 +9,10 @@ import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.UserMapper;
 import com.group.pet_service.enums.Role;
 import com.group.pet_service.model.JobPosition;
+import com.group.pet_service.model.RefreshToken;
 import com.group.pet_service.model.User;
 import com.group.pet_service.repository.JobPositionRepository;
+import com.group.pet_service.repository.RefreshTokenRepository;
 import com.group.pet_service.repository.UserRepository;
 import com.group.pet_service.util.PasswordUtil;
 import com.group.pet_service.util.UserUtil;
@@ -32,6 +34,7 @@ import java.util.*;
 public class UserService {
     UserRepository userRepository;
     JobPositionRepository jobPositionRepository;
+    RefreshTokenRepository refreshTokenRepository;
     UploadService uploadService;
     UserMapper userMapper;
     PasswordUtil passwordUtil;
@@ -58,13 +61,11 @@ public class UserService {
     }
 
     public void delete(String id) {
-        try {
-            userRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new AppException("Cannot delete species: It is being referenced by other records.");
-        } catch (Exception e) {
-            throw new AppException("An unexpected error occurred while deleting species.");
-        }
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(id).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Refresh token not found")
+        );
+        refreshTokenRepository.delete(refreshToken);
+        userRepository.deleteById(id);
     }
 
     public void addStaff(StaffCreationRequest request) throws IOException {

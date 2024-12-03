@@ -42,7 +42,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid AuthRequest request) {
         authenticationService.register(request);
         String verificationCode = UUID.randomUUID().toString();
-        codeUtil.save(verificationCode, request, 3);
+        codeUtil.save(verificationCode, request, 10);
         emailService.sendEmailToVerifyRegister(request.getEmail(), verificationCode);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .code("auth-s-01")
@@ -59,7 +59,8 @@ public class AuthenticationController {
         String redirectUrl = UriComponentsBuilder.fromUriString(clientReceiveTokensPath)
                 .queryParam("accessToken", authResponse.getAccessToken())
                 .queryParam("refreshToken", authResponse.getRefreshToken())
-                .toString();
+                .build()
+                .toUriString();
         return new RedirectView(redirectUrl);
     }
 
