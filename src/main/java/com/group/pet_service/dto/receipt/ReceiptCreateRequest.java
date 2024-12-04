@@ -27,13 +27,13 @@ public class ReceiptCreateRequest {
         @NotBlank(message = "Staff is required")
         String staffId;
 
-        @NotBlank(message = "Service is required")
-        String serviceId;
+        @NotBlank(message = "Pet service is required")
+        String cartItemId;
 
         @NotNull(message = "Start time is required")
         LocalDateTime start;
 
-        @NotNull(message = "Start end is required")
+        @NotNull(message = "End time is required")
         LocalDateTime end;
     }
 }

@@ -8,11 +8,8 @@ import com.group.pet_service.enums.PetServiceItemStatus;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.PetServiceItemMapper;
 import com.group.pet_service.mapper.ReceiptMapper;
-import com.group.pet_service.model.Pet;
+import com.group.pet_service.model.*;
 import com.group.pet_service.model.PetService;
-import com.group.pet_service.model.Receipt;
-import com.group.pet_service.model.PetServiceItem;
-import com.group.pet_service.model.User;
 import com.group.pet_service.repository.*;
 import com.group.pet_service.util.UserUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +32,7 @@ public class ReceiptService {
     private final UserRepository userRepository;
     private final PetServiceRepository petServiceRepository;
     private final PetServiceItemRepository petServiceItemRepository;
+    private final CartItemRepository cartItemRepository;
     private final ReceiptMapper receiptMapper;
     private final PetServiceItemMapper petServiceItemMapper;
 
@@ -52,17 +50,18 @@ public class ReceiptService {
         int totalItem = 0;
         int totalPriceReceipt = 0;
         Set<PetServiceItem> items = new HashSet<>();
-        for (ReceiptCreateRequest.PetServiceItemDTO serviceItemDTO : request.getItems()) {
-            User staff = userRepository.findById(serviceItemDTO.getStaffId()).orElseThrow(
+        for (ReceiptCreateRequest.PetServiceItemDTO PetServiceItemDTO : request.getItems()) {
+            User staff = userRepository.findById(PetServiceItemDTO.getStaffId()).orElseThrow(
                     () -> new AppException(HttpStatus.NOT_FOUND, "Staff not found", "user-e-03")
             );
-            PetService petService = petServiceRepository.findById(serviceItemDTO.getServiceId()).orElseThrow(
-                    () -> new AppException(HttpStatus.NOT_FOUND, "Pet Service not found", "service-e-01")
+            CartItem cartItem = cartItemRepository.findById(PetServiceItemDTO.getCartItemId()).orElseThrow(
+                    () -> new AppException(HttpStatus.NOT_FOUND, "Cart item not found", "cart-item-e-01")
             );
+            PetService petService = cartItem.getPetService();
             totalItem += 1;
             totalPriceReceipt += petService.getPrice();
-            LocalDateTime start = serviceItemDTO.getStart();
-            LocalDateTime end = serviceItemDTO.getEnd();
+            LocalDateTime start = PetServiceItemDTO.getStart();
+            LocalDateTime end = PetServiceItemDTO.getEnd();
             PetServiceItem petServiceItem = PetServiceItem.builder()
                     .start(start)
                     .end(end)
@@ -71,6 +70,7 @@ public class ReceiptService {
                     .staff(staff)
                     .build();
             items.add(petServiceItem);
+            cartItemRepository.delete(cartItem);
         }
         receipt.setItems(items);
         receipt.setTotalItem(totalItem);

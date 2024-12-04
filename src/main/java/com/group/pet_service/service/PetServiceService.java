@@ -36,7 +36,7 @@ public class PetServiceService {
     public PetServiceResponse getServiceById(String id) {
         return petServiceRepository.findById(id)
                 .map(petServiceMapper::toDTO)
-                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-s-01"));
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-e-01"));
     }
 
     @Transactional
@@ -68,9 +68,9 @@ public class PetServiceService {
         try {
             petServiceRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new AppException("Cannot delete species: It is being referenced by other records.");
+            throw new AppException("Cannot delete pet service: It is being referenced by other records.");
         } catch (Exception e) {
-            throw new AppException("An unexpected error occurred while deleting species.");
+            throw new AppException("An unexpected error occurred while deleting pet service.");
         }
     }
 
