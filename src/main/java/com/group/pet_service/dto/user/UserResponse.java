@@ -20,6 +20,6 @@ public class UserResponse {
     LocalDate dob;
     String phoneNumber;
     String avatar;
-    Timestamp createdAt;
+    String jobPosition;
     Set<Role> roles;
 }

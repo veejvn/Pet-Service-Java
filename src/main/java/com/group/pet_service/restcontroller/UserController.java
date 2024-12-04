@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String userId) {
         userService.delete(userId);
         ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
-                .code("user-s-04")
+                .code("user-s-03")
                 .message("Delete user successfully")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
@@ -55,7 +55,7 @@ public class UserController {
     @GetMapping("/staffs")
     public ResponseEntity<ApiResponse<List<StaffResponse>>> getStaffs() {
         ApiResponse<List<StaffResponse>> apiResponse = ApiResponse.<List<StaffResponse>>builder()
-                .code("user-s-05")
+                .code("user-s-04")
                 .message("Get staffs successfully")
                 .data(userService.findAllStaffs())
                 .build();

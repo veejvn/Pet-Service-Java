@@ -23,6 +23,7 @@ public interface UserMapper {
     @Mapping(target = "avatar", ignore = true)
     User toUser(StaffCreationRequest request);
 
+    @Mapping(source = "user.jobPosition.name", target = "jobPosition")
     UserResponse toUserResponse(User user);
 
     UserInfoResponse toUserInfoResponse(User user);

@@ -12,6 +12,7 @@ import com.group.pet_service.repository.PetServiceRepository;
 import com.group.pet_service.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,10 @@ public class CartItemService {
         PetService petService = petServiceRepository.findById(request.getPetServiceId()).orElseThrow(
                 () -> new AppException(HttpStatus.NOT_FOUND, "Pet service not found", "pet-service-e-01")
         );
+        boolean hasExistedPetService = cartItemRepository.existsByPetServiceId(request.getPetServiceId());
+        if (hasExistedPetService) {
+            throw new AppException(HttpStatus.CREATED, "Pet service already in cart", "cart-item-e-01");
+        }
         User user = userUtil.getUser();
         CartItem cartItem = CartItem.builder()
                 .petService(petService)
@@ -45,7 +50,7 @@ public class CartItemService {
 
     public void delete(String id) {
         CartItem cartItem = cartItemRepository.findById(id).orElseThrow(
-                () -> new AppException(HttpStatus.NOT_FOUND, "Cart item not found", "cart-item-e-01")
+                () -> new AppException(HttpStatus.NOT_FOUND, "Cart item not found", "cart-item-e-02")
         );
         cartItemRepository.delete(cartItem);
     }
