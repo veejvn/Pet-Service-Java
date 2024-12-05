@@ -31,7 +31,7 @@ public class CartItemService {
         );
         boolean hasExistedPetService = cartItemRepository.existsByPetServiceId(request.getPetServiceId());
         if (hasExistedPetService) {
-            throw new AppException(HttpStatus.CREATED, "Pet service already in cart", "cart-item-e-01");
+            throw new AppException(HttpStatus.BAD_REQUEST, "Pet service already in cart", "cart-item-e-01");
         }
         User user = userUtil.getUser();
         CartItem cartItem = CartItem.builder()

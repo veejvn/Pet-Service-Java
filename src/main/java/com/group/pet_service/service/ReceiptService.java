@@ -81,7 +81,7 @@ public class ReceiptService {
 
     public List<ReceiptResponse> getAll() {
         String id = userUtil.getUserId();
-        List<Receipt> receipts = receiptRepository.findAllByUserId(id);
+        List<Receipt> receipts = receiptRepository.findAllByUserIdOrderByCreatedAtDesc(id);
         return receiptMapper.toListReceiptResponse(receipts);
     }
 

@@ -19,20 +19,10 @@ public class SpeciesController {
 
     private final SpeciesService speciesService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<SpeciesResponse>> create(@RequestBody @Valid SpeciesRequest request) {
-        ApiResponse<SpeciesResponse> apiResponse = ApiResponse.<SpeciesResponse>builder()
-                .code("species-s-1")
-                .message("Create species successfully")
-                .data(speciesService.create(request))
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<SpeciesResponse>>> getAll() {
         ApiResponse<List<SpeciesResponse>> apiResponse = ApiResponse.<List<SpeciesResponse>>builder()
-                .code("species-s-2")
+                .code("species-s-1")
                 .message("Get all species successfully")
                 .data(speciesService.getAll())
                 .build();
@@ -42,19 +32,9 @@ public class SpeciesController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<SpeciesResponse>> get(@PathVariable String id) {
         ApiResponse<SpeciesResponse> apiResponse = ApiResponse.<SpeciesResponse>builder()
-                .code("species-s-3")
+                .code("species-s-2")
                 .message("Get species successfully")
                 .data(speciesService.get(id))
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
-        speciesService.delete(id);
-        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
-                .code("species-s-4")
-                .message("Delete species successfully")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }

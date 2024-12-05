@@ -2,6 +2,7 @@ package com.group.pet_service.service;
 
 import com.group.pet_service.dto.pet.PetRequest;
 import com.group.pet_service.dto.pet.PetResponse;
+import com.group.pet_service.dto.pet.PetUpdateRequest;
 import com.group.pet_service.exception.AppException;
 import com.group.pet_service.mapper.PetMapper;
 import com.group.pet_service.model.Pet;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -22,6 +24,7 @@ public class PetService {
     private final PetRepository petRepository;
     private final PetMapper petMapper;
     private final SpeciesRepository speciesRepository;
+    private final UploadService uploadService;
     private final UserUtil userUtil;
 
     public PetResponse create(PetRequest request) {
@@ -57,7 +60,7 @@ public class PetService {
         return petMapper.toListPetResponse(pets);
     }
 
-    public PetResponse update(PetRequest request, String id) {
+    public PetResponse update(PetUpdateRequest request, String id) {
 
         Pet pet = petRepository.findById(id).orElseThrow(
                 () -> new AppException(HttpStatus.NOT_FOUND, "Pet not found", "pet-e-1")
@@ -75,6 +78,14 @@ public class PetService {
     }
 
     public void delete(String id) {
+        Pet pet = petRepository.findById(id).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Pet not found", "pet-e-01")
+        );
+        try {
+            uploadService.deleteFile(pet.getImage());
+        } catch (IOException e) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Error while deleting photo", "pet-e-02");
+        }
         petRepository.deleteById(id);
     }
 

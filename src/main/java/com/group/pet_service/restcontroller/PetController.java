@@ -3,6 +3,7 @@ package com.group.pet_service.restcontroller;
 import com.group.pet_service.dto.pet.PetRequest;
 import com.group.pet_service.dto.api.ApiResponse;
 import com.group.pet_service.dto.pet.PetResponse;
+import com.group.pet_service.dto.pet.PetUpdateRequest;
 import com.group.pet_service.service.PetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class PetController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<PetResponse>> update(@RequestBody @Valid PetRequest request, @PathVariable String id) {
+    public ResponseEntity<ApiResponse<PetResponse>> update(@RequestBody @Valid PetUpdateRequest request, @PathVariable String id) {
         ApiResponse<PetResponse> apiResponse = ApiResponse.<PetResponse>builder()
                 .code("pet-s-4")
                 .message("Update pet successfully")

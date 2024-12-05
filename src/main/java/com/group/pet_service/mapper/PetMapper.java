@@ -2,6 +2,7 @@ package com.group.pet_service.mapper;
 
 import com.group.pet_service.dto.pet.PetRequest;
 import com.group.pet_service.dto.pet.PetResponse;
+import com.group.pet_service.dto.pet.PetUpdateRequest;
 import com.group.pet_service.model.Pet;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,5 +18,5 @@ public interface PetMapper {
 
     List<PetResponse> toListPetResponse(List<Pet> pets);
 
-    void toPetUpdateResponse(@MappingTarget Pet pet, PetRequest request);
+    void toPetUpdateResponse(@MappingTarget Pet pet, PetUpdateRequest request);
 }

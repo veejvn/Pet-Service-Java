@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, String> {
-    List<Receipt> findAllByUserId(String id);
+    List<Receipt> findAllByUserIdOrderByCreatedAtDesc(String id);
 
     List<Receipt> findDistinctByItems_Staff_Id(String staffId);
 

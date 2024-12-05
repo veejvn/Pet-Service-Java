@@ -19,7 +19,7 @@ public class CartItemController {
     private final CartItemService cartItemService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CartItemResponse>> create(@RequestBody @Valid CartItemCreationRequest request) {
+    public ResponseEntity<ApiResponse<CartItemResponse>> addCartItem(@RequestBody @Valid CartItemCreationRequest request) {
         ApiResponse<CartItemResponse> apiResponse = ApiResponse.<CartItemResponse>builder()
                 .code("cart-item-s-1")
                 .message("Add cart item successfully")

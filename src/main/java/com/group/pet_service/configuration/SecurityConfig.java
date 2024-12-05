@@ -35,7 +35,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final String[] POST_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login"};
-    private final String[] GET_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login", "/js/**", "/css/**", "/api/**", "/img/**", "/scss/**", "/vendor/**"};
+    private final String[] GET_PUBLIC_ENDPOINTS = {"/auth/**", "/", "/login", "/admin/login", "/js/**", "/css/**", "/img/**", "/scss/**", "/vendor/**", "/api/pet-services/**", "/api/users/staffs"};
 
     private final UserDetailsServiceImpl userDetailsService;
 
